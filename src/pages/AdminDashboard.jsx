@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import "./AdminDashboard.css";
 import logo from "../assets/logo.png";
 
-const API = "https://your-backend-name.onrender.com";
+const API = "https://my-react-backend-im39.onrender.com";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
