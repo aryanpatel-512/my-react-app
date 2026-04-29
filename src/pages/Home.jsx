@@ -163,7 +163,7 @@ export default function App() {
 
   const isVisible = (key) => visibleSections.has(key);
 
-const API = "http://localhost:5000";
+const API = "https://my-react-backend-im39.onrender.com";
 
 const handleFormSubmit = async (e) => {
   e.preventDefault();
