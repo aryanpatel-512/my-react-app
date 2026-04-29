@@ -24,7 +24,7 @@ export default function ProductDetail() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("https://my-react-backend-im39.onrender.com/api/products");
+      const response = await fetch("https://my-react-frontend-x5ro.onrender.com/api/products");
       const data = await response.json();
       setProducts(data);
       const found = data.find((item) => item._id === id);
@@ -51,7 +51,7 @@ export default function ProductDetail() {
 
     try {
       setSending(true);
-      const res = await fetch("https://my-react-backend-im39.onrender.com/api/inquiries", {
+      const res = await fetch("https://my-react-frontend-x5ro.onrender.com/api/inquiries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
