@@ -29,7 +29,7 @@ export default function Products() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/products");
+      const response = await fetch("https://my-react-backend-im39.onrender.com/api/products");
       const data = await response.json();
       console.log("Products loaded:", data);
       console.log("First product ID:", data[0]?._id);
