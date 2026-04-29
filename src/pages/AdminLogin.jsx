@@ -16,7 +16,7 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://my-react-backend-im39.onrender.com/api/admin/login", {
+      const res = await fetch("https://my-react-frontend-x5ro.onrender.com/api/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
