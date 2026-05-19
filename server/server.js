@@ -421,6 +421,27 @@ app.delete("/api/categories/:id", async (req, res) => {
   }
 });
 
+app.get("/fix-images", async (req, res) => {
+  try {
+    const products = await Product.find();
+
+    for (const product of products) {
+      if (product.image.includes("localhost")) {
+        product.image = product.image.replace(
+          "http://localhost:5000",
+          "https://my-react-app-production-b77b.up.railway.app"
+        );
+
+        await product.save();
+      }
+    }
+
+    res.send("Images Fixed ✅");
+  } catch (err) {
+    res.send(err.message);
+  }
+});
+
 /* ===========================
    REACT FRONTEND ROUTE
 =========================== */
