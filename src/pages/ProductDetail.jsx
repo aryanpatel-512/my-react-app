@@ -20,7 +20,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [id]);
 
   const fetchProducts = async () => {
     try {
@@ -173,16 +173,16 @@ export default function ProductDetail() {
         </div>
       )}
 
-      {/* Hero Section */}
+      {/* Product Main Section */}
       <section className="pd-hero">
         <div className="container">
           <button className="pd-back" onClick={() => navigateWithScroll("/products")}>
             ← Back to Products
           </button>
 
-          <div className="pd-grid">
-            {/* Image Gallery */}
-            <div className="pd-image-section">
+          <div className="pd-main-layout">
+            {/* Left Column - Product Image */}
+            <div className="pd-left-col">
               <div className="pd-main-image">
                 <img src={product.image} alt={product.title} />
                 <div className="pd-image-badge">
@@ -193,17 +193,21 @@ export default function ProductDetail() {
                   </div>
                 </div>
               </div>
+              <div className="pd-thumbnails">
+                <div className="pd-thumb active"><img src={product.image} alt={product.title} /></div>
+                <div className="pd-thumb"><img src={product.image} alt={product.title} /></div>
+                <div className="pd-thumb"><img src={product.image} alt={product.title} /></div>
+              </div>
             </div>
 
-            {/* Product Info */}
-            <div className="pd-info-section">
+            {/* Middle Column - Product Details */}
+            <div className="pd-middle-col">
               <div className="pd-breadcrumb">
                 <span onClick={() => navigateWithScroll("/products")}>Products</span>
                 <span>/</span>
                 <span className="active">{product.category}</span>
               </div>
 
-              <span className="pd-category">{product.category}</span>
               <h1 className="pd-title">{product.title}</h1>
 
               <div className="pd-rating">
@@ -211,41 +215,38 @@ export default function ProductDetail() {
                 <span className="rating-text">5.0 (23 customer reviews)</span>
               </div>
 
-              <p className="pd-description">{product.desc}</p>
-
-              <div className="pd-price-section">
-                <div className="pd-price">{product.price}</div>
-                <div className="pd-price-note">Inclusive of all taxes & GST</div>
+              <div className="pd-price-box">
+                <div className="pd-current-price">{product.price}</div>
+                <div className="pd-price-info">Inclusive of all taxes & GST</div>
               </div>
 
-              {/* Inquiry Form */}
-              <div className="pd-inquiry-box">
-                <h3>📋 Request Instant Quote</h3>
-                <div className="inquiry-form-row">
-                  <input type="text" placeholder="Your Full Name *" value={quoteForm.name}
-                    onChange={(e) => setQuoteForm({ ...quoteForm, name: e.target.value })} />
-                  <input type="tel" placeholder="Phone Number *" value={quoteForm.phone}
-                    onChange={(e) => setQuoteForm({ ...quoteForm, phone: e.target.value })} />
+              <div className="pd-description-box">
+                <h3>Product Description</h3>
+                <p>{product.desc}</p>
+              </div>
+
+              <div className="pd-features-box">
+                <h3>Key Features</h3>
+                <div className="pd-features-grid-2col">
+                  <div className="pd-feature-item">✓ Premium Build Quality</div>
+                  <div className="pd-feature-item">✓ Hospital Grade Finish</div>
+                  <div className="pd-feature-item">✓ Durable Steel Body</div>
+                  <div className="pd-feature-item">✓ Pan-India Delivery</div>
+                  <div className="pd-feature-item">✓ 1 Year Warranty</div>
+                  <div className="pd-feature-item">✓ Free Installation Support</div>
                 </div>
-                <input type="email" placeholder="Email Address" value={quoteForm.email}
-                  onChange={(e) => setQuoteForm({ ...quoteForm, email: e.target.value })} />
-                <textarea rows="3" placeholder="Your message or specific requirements..." value={quoteForm.message}
-                  onChange={(e) => setQuoteForm({ ...quoteForm, message: e.target.value })} />
-                <button className="inquiry-submit-btn" onClick={sendInquiry} disabled={sending}>
-                  {sending ? "Sending..." : "Send Inquiry →"}
-                </button>
               </div>
 
-              <div className="pd-actions">
+              <div className="pd-actions-box">
                 <a href={`https://wa.me/919440643193?text=Hello, I need a quote for ${product.title}`}
-                  target="_blank" rel="noreferrer" className="pd-btn btn-whatsapp">
+                  target="_blank" rel="noreferrer" className="pd-btn-wa">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                     <path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.556 4.122 1.527 5.854L.057 24l6.304-1.651A11.933 11.933 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/>
                   </svg>
-                  WhatsApp Quote
+                  WhatsApp
                 </a>
-                <a href="tel:+919440643193" className="pd-btn btn-call">
+                <a href="tel:+919440643193" className="pd-btn-call">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/>
                   </svg>
@@ -253,19 +254,43 @@ export default function ProductDetail() {
                 </a>
               </div>
 
-              <div className="pd-features-list">
-                <div className="pd-feature-item">✓ Premium Build Quality</div>
-                <div className="pd-feature-item">✓ Hospital Grade Finish</div>
-                <div className="pd-feature-item">✓ Durable Steel Body</div>
-                <div className="pd-feature-item">✓ Pan-India Delivery</div>
-              </div>
-
-              <div className="pd-share">
+              <div className="pd-share-box">
                 <span>Share this product:</span>
                 <div className="pd-share-icons">
                   <a href="#" onClick={(e) => { e.preventDefault(); window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`); }}>📘</a>
                   <a href="#" onClick={(e) => { e.preventDefault(); window.open(`https://twitter.com/intent/tweet?text=${product.title}&url=${window.location.href}`); }}>🐦</a>
                   <a href="#" onClick={(e) => { e.preventDefault(); window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${window.location.href}`); }}>💼</a>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Quote Form */}
+            <div className="pd-right-col">
+              <div className="pd-quote-card">
+                <h3>📋 Request Instant Quote</h3>
+                <div className="pd-quote-price">
+                  <span className="quote-price">{product.price}</span>
+                  <span className="quote-tax">Best Price Guaranteed</span>
+                </div>
+                <div className="pd-quote-form">
+                  <input type="text" placeholder="Full Name *" value={quoteForm.name}
+                    onChange={(e) => setQuoteForm({ ...quoteForm, name: e.target.value })} />
+                  <input type="tel" placeholder="Phone Number *" value={quoteForm.phone}
+                    onChange={(e) => setQuoteForm({ ...quoteForm, phone: e.target.value })} />
+                  <input type="email" placeholder="Email Address" value={quoteForm.email}
+                    onChange={(e) => setQuoteForm({ ...quoteForm, email: e.target.value })} />
+                  <textarea rows="3" placeholder="Your requirements or message..."
+                    value={quoteForm.message}
+                    onChange={(e) => setQuoteForm({ ...quoteForm, message: e.target.value })} />
+                  <button className="quote-submit-btn" onClick={sendInquiry} disabled={sending}>
+                    {sending ? "Sending..." : "Get Best Quote →"}
+                  </button>
+                </div>
+                <div className="pd-quote-features">
+                  <div className="quote-feature">✓ Free Delivery</div>
+                  <div className="quote-feature">✓ Easy Returns</div>
+                  <div className="quote-feature">✓ Bulk Discount</div>
+                  <div className="quote-feature">✓ PAN India Supply</div>
                 </div>
               </div>
             </div>
@@ -291,20 +316,20 @@ export default function ProductDetail() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Benefits Section */}
       <section className="pd-section light">
         <div className="container">
           <div className="pd-section-header">
             <p className="eyebrow">Why Choose This</p>
-            <h2>Key <span className="highlight">Features</span></h2>
+            <h2>Key <span className="highlight">Benefits</span></h2>
           </div>
-          <div className="pd-features-grid">
-            <div className="pd-feature-card"><div className="feature-icon">🏗️</div><h4>Heavy Duty Frame</h4><p>Engineered with robust steel construction for maximum durability.</p></div>
-            <div className="pd-feature-card"><div className="feature-icon">🛡️</div><h4>Corrosion Resistant</h4><p>Special coating prevents rust and ensures long-lasting performance.</p></div>
-            <div className="pd-feature-card"><div className="feature-icon">🔄</div><h4>Smooth Mobility</h4><p>Premium castor wheels with locking mechanism for easy movement.</p></div>
-            <div className="pd-feature-card"><div className="feature-icon">🧼</div><h4>Easy to Clean</h4><p>Hygienic surface design meets hospital sanitation standards.</p></div>
-            <div className="pd-feature-card"><div className="feature-icon">⚡</div><h4>Quick Assembly</h4><p>Easy-to-follow instructions for fast and hassle-free setup.</p></div>
-            <div className="pd-feature-card"><div className="feature-icon">📦</div><h4>Warranty Support</h4><p>Comprehensive warranty coverage with dedicated service team.</p></div>
+          <div className="pd-benefits-grid">
+            <div className="pd-benefit-card"><div className="benefit-icon">🏗️</div><h4>Heavy Duty Frame</h4><p>Engineered with robust steel construction for maximum durability.</p></div>
+            <div className="pd-benefit-card"><div className="benefit-icon">🛡️</div><h4>Corrosion Resistant</h4><p>Special coating prevents rust and ensures long-lasting performance.</p></div>
+            <div className="pd-benefit-card"><div className="benefit-icon">🔄</div><h4>Smooth Mobility</h4><p>Premium castor wheels with locking mechanism for easy movement.</p></div>
+            <div className="pd-benefit-card"><div className="benefit-icon">🧼</div><h4>Easy to Clean</h4><p>Hygienic surface design meets hospital sanitation standards.</p></div>
+            <div className="pd-benefit-card"><div className="benefit-icon">⚡</div><h4>Quick Assembly</h4><p>Easy-to-follow instructions for fast and hassle-free setup.</p></div>
+            <div className="pd-benefit-card"><div className="benefit-icon">📦</div><h4>Warranty Support</h4><p>Comprehensive warranty coverage with dedicated service team.</p></div>
           </div>
         </div>
       </section>
@@ -340,7 +365,7 @@ export default function ProductDetail() {
                   navigate(`/product/${item._id}`);
                 }}>
                   <div className="related-image"><img src={item.image} alt={item.title} /><span className="related-category">{item.category}</span></div>
-                  <div className="related-info"><h4>{item.title.length > 40 ? item.title.substring(0, 40) + "..." : item.title}</h4><p>{item.price}</p><span className="related-view">View Details →</span></div>
+                  <div className="related-info"><h4>{item.title.length > 35 ? item.title.substring(0, 35) + "..." : item.title}</h4><p>{item.price}</p><span className="related-view">View Details →</span></div>
                 </div>
               ))}
             </div>

@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import "./AdminDashboard.css";
 import logo from "../assets/logo.png";
 
-const API = "https://my-react-backend-im39.onrender.com";
+const API = "http://localhost:5000";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -20,12 +20,15 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [formKey, setFormKey] = useState(0);
   
+  // Category expand/collapse state
+  const [expandedCategories, setExpandedCategories] = useState({});
+  
   // Filter states for inquiries
   const [inquiryFilter, setInquiryFilter] = useState("all");
   const [inquirySearch, setInquirySearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
-  const [leadType, setLeadType] = useState("all"); // 🔥 NEW: Lead Type Filter
+  const [leadType, setLeadType] = useState("all");
   
   // Notes modal state
   const [showNotesModal, setShowNotesModal] = useState(false);
@@ -38,22 +41,22 @@ export default function AdminDashboard() {
 
   // Status options
   const statusOptions = [
-    { value: "new", label: "🆕 New", color: "#ef4444", bg: "#fee2e2" },
-    { value: "contacted", label: "📞 Contacted", color: "#f59e0b", bg: "#fef3c7" },
-    { value: "quotation", label: "📄 Quotation Sent", color: "#3b82f6", bg: "#dbeafe" },
-    { value: "negotiation", label: "🤝 Negotiation", color: "#8b5cf6", bg: "#ede9fe" },
-    { value: "closed", label: "✅ Closed", color: "#10b981", bg: "#d1fae5" },
-    { value: "rejected", label: "❌ Rejected", color: "#6b7280", bg: "#f3f4f6" }
+    { value: "new", label: "New", color: "#ef4444", bg: "#fee2e2" },
+    { value: "contacted", label: "Contacted", color: "#f59e0b", bg: "#fef3c7" },
+    { value: "quotation", label: "Quotation Sent", color: "#3b82f6", bg: "#dbeafe" },
+    { value: "negotiation", label: "Negotiation", color: "#8b5cf6", bg: "#ede9fe" },
+    { value: "closed", label: "Closed", color: "#10b981", bg: "#d1fae5" },
+    { value: "rejected", label: "Rejected", color: "#6b7280", bg: "#f3f4f6" }
   ];
 
   // Priority options
   const priorityOptions = [
     { value: "normal", label: "Normal", color: "#6b7280", bg: "#f3f4f6" },
-    { value: "hot", label: "🔥 Hot Lead", color: "#ef4444", bg: "#fee2e2" },
-    { value: "bulk", label: "📦 Bulk Order", color: "#8b5cf6", bg: "#ede9fe" },
-    { value: "dealer", label: "🏪 Dealer", color: "#f59e0b", bg: "#fef3c7" },
-    { value: "urgent", label: "⚠️ Urgent", color: "#dc2626", bg: "#fee2e2" },
-    { value: "hospital", label: "🏥 Hospital", color: "#10b981", bg: "#d1fae5" }
+    { value: "hot", label: "Hot Lead", color: "#ef4444", bg: "#fee2e2" },
+    { value: "bulk", label: "Bulk Order", color: "#8b5cf6", bg: "#ede9fe" },
+    { value: "dealer", label: "Dealer", color: "#f59e0b", bg: "#fef3c7" },
+    { value: "urgent", label: "Urgent", color: "#dc2626", bg: "#fee2e2" },
+    { value: "hospital", label: "Hospital", color: "#10b981", bg: "#d1fae5" }
   ];
 
   const showToast = (message, type = "success") => {
@@ -93,37 +96,49 @@ export default function AdminDashboard() {
     } catch (err) { console.warn("fetchInquiries:", err.message); }
   }, []);
 
+  // Toggle category expand/collapse
+  const toggleCategory = (categoryId) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
+  };
+
+  // Get products by category
+  const getProductsByCategory = (categoryName) => {
+    return products.filter(product => product.category === categoryName);
+  };
+
   // Generate WhatsApp message
   const getWhatsAppMessage = (inq) => {
     const msg = 
-`🏥 Sri Srinivasa Clean Rooms
+`Sri Srinivasa Clean Rooms
 
-📞 Call/WhatsApp: +91 94406 43193
-📧 Email: chakri.9441@gmail.com
-
-────────────────────────────
-
-📋 NEW INQUIRY RECEIVED
-
-👤 Name: ${inq.name}
-📱 Phone: ${inq.phone}
-📧 Email: ${inq.email || "Not provided"}
-📦 Product: ${inq.productName || "Not specified"}
-💬 Message: ${inq.message || "No message"}
-📅 Date: ${new Date(inq.createdAt).toLocaleString()}
-🏷️ Status: New
-⭐ Priority: Normal
+Call/WhatsApp: +91 94406 43193
+Email: chakri.9441@gmail.com
 
 ────────────────────────────
 
-🔹 Premium Medical Furniture Manufacturer
-🔹 Trusted by 50+ Hospitals Across India
-🔹 ISO Certified Quality
+NEW INQUIRY RECEIVED
 
-📍 Subhash Nagar, Malkajgiri
-📍 Telangana – 500055
+Name: ${inq.name}
+Phone: ${inq.phone}
+Email: ${inq.email || "Not provided"}
+Product: ${inq.productName || "Not specified"}
+Message: ${inq.message || "No message"}
+Date: ${new Date(inq.createdAt).toLocaleString()}
+Status: New
+Priority: Normal
 
-⏰ Response: Within 24 hours
+────────────────────────────
+
+Premium Medical Furniture Manufacturer
+Trusted by 50+ Hospitals Across India
+ISO Certified Quality
+
+Address: Subhash Nagar, Malkajgiri, Telangana – 500055
+
+Response: Within 24 hours
 
 Thank you for choosing Sri Srinivasa Clean Rooms`;
     
@@ -161,12 +176,12 @@ ABOUT US
 Sri Srinivasa Clean Rooms is India's leading manufacturer of premium medical furniture and clean room infrastructure.
 
 Our Products:
-✓ ICU Beds & Hospital Furniture
-✓ Modular Clean Room Systems
-✓ Medical Lockers & Storage
-✓ Procedure & Examination Tables
-✓ Hospital Trolleys
-✓ Nurse Stations
+- ICU Beds & Hospital Furniture
+- Modular Clean Room Systems
+- Medical Lockers & Storage
+- Procedure & Examination Tables
+- Hospital Trolleys
+- Nurse Stations
 
 Trusted by 50+ hospitals across India.
 
@@ -233,18 +248,16 @@ Sri Srinivasa Clean Rooms`;
     }
   };
 
-useEffect(() => {
-  const token = localStorage.getItem("adminToken");
-
-  if (!token) {
-    navigate("/admin/login", { replace: true });
-    return;
-  }
-
-  fetchProducts();
-  fetchInquiries();
-  fetchCategories();
-}, [navigate]);
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      navigate("/admin/login", { replace: true });
+      return;
+    }
+    fetchProducts();
+    fetchInquiries();
+    fetchCategories();
+  }, [navigate]);
 
   // Safe CSV Export
   const exportToCSV = () => {
@@ -427,28 +440,21 @@ useEffect(() => {
 
   const logout = () => { localStorage.removeItem("adminToken"); navigate("/admin/login"); };
 
-  // 🔥 UPDATED: Filter inquiries with Lead Type
+  // Filter inquiries with Lead Type
   const filteredInquiries = inquiries.filter(inq => {
-    // Search filter
     const matchesSearch = !inquirySearch || 
       inq.name?.toLowerCase().includes(inquirySearch.toLowerCase()) ||
       inq.phone?.includes(inquirySearch) ||
       inq.email?.toLowerCase().includes(inquirySearch.toLowerCase()) ||
       inq.productName?.toLowerCase().includes(inquirySearch.toLowerCase());
     
-    // Status filter
     const matchesStatus = statusFilter === "all" || inq.status === statusFilter;
-    
-    // Priority filter
     const matchesPriority = priorityFilter === "all" || inq.priority === priorityFilter;
     
-    // 🔥 NEW: Lead Type filter
-  const matchesType =
-  leadType === "all" ||
-  (leadType === "product" && inq.type === "product") ||
-  (leadType === "general" && (!inq.type || inq.type === "general"));
+    const matchesType = leadType === "all" ||
+      (leadType === "product" && inq.type === "product") ||
+      (leadType === "general" && (!inq.type || inq.type === "general"));
     
-    // Quick filter (unread, today, week, closed, hot)
     let matchesQuick = true;
     if (inquiryFilter === "unread") matchesQuick = !inq.read;
     else if (inquiryFilter === "today") {
@@ -496,10 +502,11 @@ useEffect(() => {
     { id:"categories", label:"Categories", badge: categories.length, icon: "🏷️" },
     { id:"inquiries", label:"Inquiries", badge: unreadCount || null, badgeWarn: true, icon: "💬" },
     { id:"analytics", label:"Analytics", badge: null, icon: "📊" },
+    
   ];
 
   const getPageTitle = () => {
-    if (activeTab === "add-product") return editingProduct ? "✎ Edit Product" : "➕ Add New Product";
+    if (activeTab === "add-product") return editingProduct ? "Edit Product" : "Add New Product";
     return navItems.find(n => n.id === activeTab)?.label || "";
   };
 
@@ -596,11 +603,13 @@ useEffect(() => {
             <div className="adm-card">
               <div className="adm-card__header">
                 <div><h2 className="adm-card__title">All Products</h2><p className="adm-card__sub">{filteredProducts.length} items in catalog</p></div>
-                <button className="adm-btn adm-btn--primary" onClick={() => { setEditingProduct(null); setFormKey(k => k + 1); setActiveTab("add-product"); }}>➕ Add Product</button>
+                <button className="adm-btn adm-btn--primary" onClick={() => { setEditingProduct(null); setFormKey(k => k + 1); setActiveTab("add-product"); }}>+ Add Product</button>
               </div>
               <div className="adm-table-wrap">
                 <table className="adm-table">
-                  <thead><tr><th>Image</th><th>Product Name</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead>
+                  <thead>
+                    <tr><th>Image</th><th>Product Name</th><th>Category</th><th>Price</th><th>Actions</th></tr>
+                  </thead>
                   <tbody>
                     {filteredProducts.map(item => (
                       <tr key={item._id}>
@@ -652,7 +661,7 @@ useEffect(() => {
               <div className="adm-card__header">
                 <div>
                   <h2 className="adm-card__title">Manage Categories</h2>
-                  <p className="adm-card__sub">{categories.length} total categories</p>
+                  <p className="adm-card__sub">{categories.length} total categories - Click on any category to view its products</p>
                 </div>
               </div>
               
@@ -667,12 +676,12 @@ useEffect(() => {
                     onKeyPress={(e) => e.key === 'Enter' && addCategory()}
                   />
                   <button onClick={addCategory} className="adm-btn adm-btn--primary">
-                    ➕ Add Category
+                    + Add Category
                   </button>
                 </div>
               </div>
 
-              <div className="categories-list">
+              <div className="categories-list-expandable">
                 {categories.length === 0 ? (
                   <div className="adm-empty">
                     <div className="adm-empty__icon">🏷️</div>
@@ -681,25 +690,97 @@ useEffect(() => {
                 ) : (
                   categories.map((cat, i) => {
                     const count = getCategoryCount(cat.name);
+                    const categoryProducts = getProductsByCategory(cat.name);
+                    const isExpanded = expandedCategories[cat._id];
+                    
                     return (
-                      <div key={cat._id} className="category-item">
-                        <div className="category-info">
-                          <div className="category-number">{String(i + 1).padStart(2, "0")}</div>
-                          <div className="category-details">
-                            <strong className="category-name">{cat.name}</strong>
-                            <span className="category-count">{count} {count === 1 ? "product" : "products"}</span>
-                          </div>
-                          <span className={`category-status ${count > 0 ? "active" : "empty"}`}>
-                            {count > 0 ? "Active" : "Empty"}
-                          </span>
-                        </div>
-                        <button 
-                          onClick={() => deleteCategory(cat._id)} 
-                          className="adm-icon-btn adm-icon-btn--del"
-                          title="Delete Category"
+                      <div key={cat._id} className="category-expandable-item">
+                        <div 
+                          className="category-expandable-header"
+                          onClick={() => toggleCategory(cat._id)}
                         >
-                          🗑️
-                        </button>
+                          <div className="category-expandable-left">
+                            <span className="expand-icon">{isExpanded ? "▼" : "▶"}</span>
+                            <span className="category-number">{String(i + 1).padStart(2, "0")}</span>
+                            <div className="category-details-expandable">
+                              <strong className="category-name">{cat.name}</strong>
+                              <span className="category-count">{count} {count === 1 ? "product" : "products"}</span>
+                            </div>
+                          </div>
+                          <div className="category-expandable-right">
+                            <span className={`category-status ${count > 0 ? "active" : "empty"}`}>
+                              {count > 0 ? "Active" : "Empty"}
+                            </span>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteCategory(cat._id);
+                              }} 
+                              className="adm-icon-btn adm-icon-btn--del"
+                              title="Delete Category"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {isExpanded && (
+                          <div className="category-products-list">
+                            <div className="category-products-header">
+                              <span>Products in "{cat.name}"</span>
+                              <span>{categoryProducts.length} items</span>
+                            </div>
+                            {categoryProducts.length === 0 ? (
+                              <div className="category-products-empty">
+                                <p>No products in this category yet.</p>
+                                <button 
+                                  className="adm-btn adm-btn--sm adm-btn--primary"
+                                  onClick={() => {
+                                    setActiveTab("add-product");
+                                    setEditingProduct(null);
+                                  }}
+                                >
+                                  + Add Product
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="category-products-grid">
+                                {categoryProducts.map(product => (
+                                  <div key={product._id} className="category-product-item">
+                                    <div className="category-product-image">
+                                      <img src={product.image} alt={product.title} />
+                                    </div>
+                                    <div className="category-product-info">
+                                      <h4>{product.title}</h4>
+                                      <p className="product-price">{product.price}</p>
+                                      <p className="product-desc">{product.desc?.substring(0, 60)}...</p>
+                                    </div>
+                                    <div className="category-product-actions">
+                                      <button 
+                                        className="adm-icon-btn adm-icon-btn--edit"
+                                        onClick={() => {
+                                          setEditingProduct(product);
+                                          setFormKey(k => k + 1);
+                                          setActiveTab("add-product");
+                                        }}
+                                        title="Edit Product"
+                                      >
+                                        ✏️
+                                      </button>
+                                      <button 
+                                        className="adm-icon-btn adm-icon-btn--del"
+                                        onClick={() => deleteProduct(product._id)}
+                                        title="Delete Product"
+                                      >
+                                        🗑️
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })
@@ -708,51 +789,50 @@ useEffect(() => {
             </div>
           )}
 
-          {/* 🔥 UPDATED: Inquiries Tab with Lead Type Filter */}
+          {/* Inquiries Tab */}
           {activeTab === "inquiries" && (
             <div className="adm-card">
               <div className="adm-card__header">
                 <div><h2 className="adm-card__title">Customer Inquiries</h2><p className="adm-card__sub">{unreadCount} unread · {inquiries.length} total</p></div>
                 <div className="inquiry-actions-header">
                   <button className="adm-btn adm-btn--sm adm-btn--primary" onClick={exportToCSV}>
-                    📊 Export to CSV
+                    Export to CSV
                   </button>
                 </div>
               </div>
 
-              {/* 🔥 NEW: Lead Type Filter Dropdown */}
               <div className="inquiry-filters">
                 <div className="filter-group">
                   <select value={leadType} onChange={e => { setLeadType(e.target.value); setCurrentPage(1); }} className="filter-select">
-                    <option value="all">📋 All Leads</option>
-                    <option value="product">📦 Product Leads</option>
-                    <option value="general">💬 General Leads</option>
+                    <option value="all">All Leads</option>
+                    <option value="product">Product Leads</option>
+                    <option value="general">General Leads</option>
                   </select>
                 </div>
                 <div className="filter-group">
-                  <input type="text" placeholder="🔍 Search by name, phone, email, product..." value={inquirySearch} onChange={e => { setInquirySearch(e.target.value); setCurrentPage(1); }} className="filter-search" />
-                </div>
-                <div className="filter-group">
                   <select value={inquiryFilter} onChange={e => { setInquiryFilter(e.target.value); setCurrentPage(1); }} className="filter-select">
-                    <option value="all">📋 All Inquiries</option>
-                    <option value="unread">🆕 Unread Only</option>
-                    <option value="today">📅 Today</option>
-                    <option value="week">📆 This Week</option>
-                    <option value="closed">✅ Closed</option>
-                    <option value="hot">🔥 Hot Leads</option>
+                    <option value="all">All Inquiries</option>
+                    <option value="unread">Unread Only</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="closed">Closed</option>
+                    <option value="hot">Hot Leads</option>
                   </select>
                 </div>
                 <div className="filter-group">
                   <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }} className="filter-select">
-                    <option value="all">🏷️ All Status</option>
+                    <option value="all">All Status</option>
                     {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                   </select>
                 </div>
                 <div className="filter-group">
                   <select value={priorityFilter} onChange={e => { setPriorityFilter(e.target.value); setCurrentPage(1); }} className="filter-select">
-                    <option value="all">⭐ All Priorities</option>
+                    <option value="all">All Priorities</option>
                     {priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                   </select>
+                </div>
+                <div className="filter-group">
+                  <input type="text" placeholder="Search by name, phone, email, product..." value={inquirySearch} onChange={e => { setInquirySearch(e.target.value); setCurrentPage(1); }} className="filter-search" />
                 </div>
               </div>
 
@@ -774,13 +854,12 @@ useEffect(() => {
                           <div className="adm-inq__meta">
                             <strong>{inq.name}</strong>
                             <span>{inq.email || "No email"} {inq.phone && `· ${inq.phone}`}</span>
-                            {inq.productName && <span className="inq-product-tag">📦 {inq.productName}</span>}
+                            {inq.productName && <span className="inq-product-tag">Product: {inq.productName}</span>}
                           </div>
                           <div className="adm-inq__right">
                             <div className="inq-badges">
-                              {/* 🔥 NEW: Lead Type Badge */}
                               <span className={`lead-type-badge ${inq.type === "product" ? "badge-product" : "badge-general"}`}>
-                                {inq.type === "product" ? "📦 Product Lead" : "💬 General Lead"}
+                                {inq.type === "product" ? "Product Lead" : "General Lead"}
                               </span>
                               <select className="status-select" value={inq.status || "new"} style={{ background: statusStyle.bg, color: statusStyle.color }} onChange={(e) => updateInquiryStatus(inq._id, e.target.value)}>
                                 {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
@@ -794,10 +873,9 @@ useEffect(() => {
                         </div>
                         <div className="adm-inq__msg">{inq.message}</div>
                         
-                        {/* Notes Section */}
                         {inq.notes && inq.notes.length > 0 && (
                           <div className="inq-notes">
-                            <div className="inq-notes__title">📝 Notes</div>
+                            <div className="inq-notes__title">Notes</div>
                             {inq.notes.map((note, idx) => (
                               <div key={idx} className="inq-note">
                                 <span className="inq-note__date">{new Date(note.createdAt).toLocaleString()}</span>
@@ -808,11 +886,11 @@ useEffect(() => {
                         )}
                         
                         <div className="adm-inq__actions">
-                          {!inq.read && <button className="adm-btn adm-btn--sm adm-btn--primary" onClick={() => markAsRead(inq._id)}>✓ Mark as Read</button>}
-                          <a href={whatsappUrl} target="_blank" rel="noreferrer" className="adm-btn adm-btn--sm btn-wa">💬 WhatsApp</a>
-                          <a href={`tel:${inq.phone}`} className="adm-btn adm-btn--sm btn-call">📞 Call</a>
-                          <button className="adm-btn adm-btn--sm btn-note" onClick={() => { setSelectedInquiry(inq); setShowNotesModal(true); }}>📝 Add Note</button>
-                          <a href={emailUrl} className="adm-btn adm-btn--sm btn-email">📧 Send Email</a>
+                          {!inq.read && <button className="adm-btn adm-btn--sm adm-btn--primary" onClick={() => markAsRead(inq._id)}>Mark as Read</button>}
+                          <a href={whatsappUrl} target="_blank" rel="noreferrer" className="adm-btn adm-btn--sm btn-wa">WhatsApp</a>
+                          <a href={`tel:${inq.phone}`} className="adm-btn adm-btn--sm btn-call">Call</a>
+                          <button className="adm-btn adm-btn--sm btn-note" onClick={() => { setSelectedInquiry(inq); setShowNotesModal(true); }}>Add Note</button>
+                          <a href={emailUrl} className="adm-btn adm-btn--sm btn-email">Send Email</a>
                           <button className="adm-icon-btn adm-icon-btn--del" onClick={() => deleteInquiry(inq._id)}>🗑️</button>
                         </div>
                       </div>
@@ -821,7 +899,6 @@ useEffect(() => {
                 )}
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="pagination-wrapper">
                   <button className="page-btn" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>← Previous</button>
@@ -835,15 +912,15 @@ useEffect(() => {
           {/* Analytics Tab */}
           {activeTab === "analytics" && (
             <div className="adm-analytics">
-              <div className="adm-chart-card"><h3>📊 Products by Category</h3><div className="adm-chart">{categories.filter(c => getCategoryCount(c.name) > 0).length === 0 && <p style={{ color: "var(--text-muted)", padding: "20px 0" }}>No product data yet.</p>}{categories.filter(c => getCategoryCount(c.name) > 0).map((cat, i) => { const count = getCategoryCount(cat.name); const max = Math.max(...categories.map(c => getCategoryCount(c.name)), 1); return (<div key={i} className="adm-chart__row"><div className="adm-chart__label">{cat.name}</div><div className="adm-chart__bar-bg"><div className="adm-chart__bar" style={{ width: `${(count / max) * 100}%` }} /></div><div className="adm-chart__val">{count}</div></div>); })}</div></div>
-              <div className="adm-chart-card"><h3>📈 Summary</h3><div className="adm-activity"><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Total products</p><span>{products.length} products</span></div></div><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Active categories</p><span>{categories.filter(c => getCategoryCount(c.name) > 0).length} of {categories.length}</span></div></div><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Customer inquiries</p><span>{inquiries.length} total</span></div></div><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Unread inquiries</p><span>{unreadCount} pending</span></div></div></div></div>
+              <div className="adm-chart-card"><h3>Products by Category</h3><div className="adm-chart">{categories.filter(c => getCategoryCount(c.name) > 0).length === 0 && <p style={{ color: "var(--text-muted)", padding: "20px 0" }}>No product data yet.</p>}{categories.filter(c => getCategoryCount(c.name) > 0).map((cat, i) => { const count = getCategoryCount(cat.name); const max = Math.max(...categories.map(c => getCategoryCount(c.name)), 1); return (<div key={i} className="adm-chart__row"><div className="adm-chart__label">{cat.name}</div><div className="adm-chart__bar-bg"><div className="adm-chart__bar" style={{ width: `${(count / max) * 100}%` }} /></div><div className="adm-chart__val">{count}</div></div>); })}</div></div>
+              <div className="adm-chart-card"><h3>Summary</h3><div className="adm-activity"><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Total products</p><span>{products.length} products</span></div></div><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Active categories</p><span>{categories.filter(c => getCategoryCount(c.name) > 0).length} of {categories.length}</span></div></div><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Customer inquiries</p><span>{inquiries.length} total</span></div></div><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Unread inquiries</p><span>{unreadCount} pending</span></div></div></div></div>
             </div>
           )}
 
           {/* Settings Tab */}
           {activeTab === "settings" && (
             <div className="adm-card">
-              <div className="adm-card__header"><div><h2 className="adm-card__title">⚙️ Settings</h2><p className="adm-card__sub">Manage admin profile and preferences</p></div></div>
+              <div className="adm-card__header"><div><h2 className="adm-card__title">Settings</h2><p className="adm-card__sub">Manage admin profile and preferences</p></div></div>
               <form className="adm-form" onSubmit={e => { e.preventDefault(); showToast("Settings saved!"); }}>
                 <div className="adm-form__section"><h4 className="adm-form__section-title">Profile Information</h4><div className="adm-form__grid"><div className="adm-form__field"><label>Full Name</label><input type="text" defaultValue="Administrator" /></div><div className="adm-form__field"><label>Email Address</label><input type="email" defaultValue="admin@srisrinivasa.com" /></div></div></div>
                 <div className="adm-form__section"><h4 className="adm-form__section-title">Change Password</h4><div className="adm-form__grid"><div className="adm-form__field"><label>Current Password</label><input type="password" placeholder="••••••••" /></div><div className="adm-form__field"><label>New Password</label><input type="password" placeholder="••••••••" /></div><div className="adm-form__field"><label>Confirm Password</label><input type="password" placeholder="••••••••" /></div></div></div>
@@ -859,7 +936,7 @@ useEffect(() => {
         <div className="modal-overlay" onClick={() => { setShowNotesModal(false); setNoteText(""); }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>📝 Add Note for {selectedInquiry.name}</h3>
+              <h3>Add Note for {selectedInquiry.name}</h3>
               <button className="modal-close" onClick={() => { setShowNotesModal(false); setNoteText(""); }}>✕</button>
             </div>
             <div className="modal-body">
