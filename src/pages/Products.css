@@ -914,13 +914,18 @@ body {
   color: white;
   border-color: transparent;
 }
-
 /* CTA Banner */
 .cta-banner {
   position: relative;
   padding: 110px 0;
   overflow: hidden;
-  background: linear-gradient(135deg, #042f2e, #064e3b, #0a4a42, #042f2e);
+  background: linear-gradient(
+    135deg,
+    #042f2e,
+    #064e3b,
+    #0a4a42,
+    #042f2e
+  );
 }
 
 .cta-banner__bg {
@@ -940,6 +945,81 @@ body {
   height: 4px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.35);
+  animation: floatParticle 6s ease-in-out infinite;
+}
+
+/* Particle Positions */
+.cta-banner__particle:nth-child(1) {
+  top: 10%;
+  left: 5%;
+}
+
+.cta-banner__particle:nth-child(2) {
+  top: 20%;
+  left: 25%;
+}
+
+.cta-banner__particle:nth-child(3) {
+  top: 8%;
+  left: 40%;
+}
+
+.cta-banner__particle:nth-child(4) {
+  top: 35%;
+  left: 15%;
+}
+
+.cta-banner__particle:nth-child(5) {
+  top: 15%;
+  left: 70%;
+}
+
+.cta-banner__particle:nth-child(6) {
+  top: 50%;
+  left: 80%;
+}
+
+.cta-banner__particle:nth-child(7) {
+  top: 65%;
+  left: 10%;
+}
+
+.cta-banner__particle:nth-child(8) {
+  top: 75%;
+  left: 45%;
+}
+
+.cta-banner__particle:nth-child(9) {
+  top: 55%;
+  left: 60%;
+}
+
+.cta-banner__particle:nth-child(10) {
+  top: 30%;
+  left: 90%;
+}
+
+.cta-banner__particle:nth-child(11) {
+  top: 80%;
+  left: 75%;
+}
+
+.cta-banner__particle:nth-child(12) {
+  top: 60%;
+  left: 35%;
+}
+
+@keyframes floatParticle {
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
 }
 
 .cta-banner__inner {
@@ -949,6 +1029,12 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 60px;
+}
+
+.cta-banner__text,
+.cta-banner__actions {
+  position: relative;
+  z-index: 10;
 }
 
 .cta-banner__text {
@@ -965,11 +1051,13 @@ body {
 }
 
 .cta-banner__text h2 {
-  color: #fff;
+  color: white !important;
   font-size: 58px;
   line-height: 1.1;
   font-weight: 700;
   margin-bottom: 18px;
+  position: relative;
+  z-index: 10;
 }
 
 .cta-banner__sub {
@@ -979,8 +1067,6 @@ body {
 }
 
 .cta-banner__actions {
-  position: relative;
-  z-index: 10;
   display: flex;
   gap: 18px;
   flex-wrap: wrap;
