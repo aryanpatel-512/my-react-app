@@ -381,10 +381,7 @@ const handleFormSubmit = async (e) => {
           </div>
         </div>
 
-        <div className="hero__scroll-cue" aria-hidden="true">
-          <span className="hero__scroll-text">Scroll</span>
-          <div className="hero__scroll-track"><div className="hero__scroll-thumb" /></div>
-        </div>
+       
       </section>
 
       {/* ── MARQUEE BAND ── */}
