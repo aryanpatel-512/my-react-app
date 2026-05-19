@@ -17,8 +17,18 @@ const app = express();
 =========================== */
 app.use(cors());
 app.use(express.json());
+
 app.use("/api/admin", adminRoutes);
-app.use("/uploads", express.static("uploads"));
+
+/* ===========================
+   STATIC UPLOADS
+=========================== */
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+/* ===========================
+   FRONTEND DIST SERVE
+=========================== */
+app.use(express.static(path.join(__dirname, "../dist")));
 
 /* ===========================
    MULTER IMAGE UPLOAD
@@ -38,18 +48,6 @@ const upload = multer({ storage });
 /* ===========================
    MONGODB CONNECT
 =========================== */
-mongoose
-  .connect(process.env.MONGO_URL)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.log("❌ DB Error:", err));
-
-/* ===========================
-   TEST ROUTE
-=========================== */
-app.get("/", (req, res) => {
-  res.send("Backend Running 🚀");
-});
-
 mongoose
   .connect(process.env.MONGO_URL)
   .then(async () => {
@@ -75,7 +73,7 @@ mongoose
       "Foot Steps",
       "IV Stands",
       "Waste Management",
-      "Stools"
+      "Stools",
     ];
 
     for (const item of defaultCategories) {
@@ -91,20 +89,29 @@ mongoose
   .catch((err) => console.log("❌ DB Error:", err));
 
 /* ===========================
+   TEST ROUTE
+=========================== */
+app.get("/api/test", (req, res) => {
+  res.send("Backend Running 🚀");
+});
+
+/* ===========================
    PRODUCTS
 =========================== */
 
 // ADD PRODUCT
 app.post("/api/products", upload.single("image"), async (req, res) => {
   try {
+    const imageUrl = req.file
+      ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+      : "";
+
     const newProduct = new Product({
       title: req.body.title,
       price: req.body.price,
       category: req.body.category,
       desc: req.body.desc,
-      image: req.file
-        ? `http://localhost:5000/uploads/${req.file.filename}`
-        : "",
+      image: imageUrl,
     });
 
     await newProduct.save();
@@ -126,6 +133,7 @@ app.post("/api/products", upload.single("image"), async (req, res) => {
 app.get("/api/products", async (req, res) => {
   try {
     const data = await Product.find().sort({ createdAt: -1 });
+
     res.json(data);
   } catch (error) {
     res.status(500).json({
@@ -146,7 +154,7 @@ app.put("/api/products/:id", upload.single("image"), async (req, res) => {
     };
 
     if (req.file) {
-      updateData.image = `http://localhost:5000/uploads/${req.file.filename}`;
+      updateData.image = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -193,6 +201,7 @@ app.delete("/api/products/:id", async (req, res) => {
 app.get("/api/inquiries", async (req, res) => {
   try {
     const data = await Inquiry.find().sort({ createdAt: -1 });
+
     res.json(data);
   } catch (error) {
     res.status(500).json({
@@ -212,20 +221,19 @@ app.post("/api/inquiries", async (req, res) => {
       message: req.body.message,
       productName: req.body.productName || "",
       type: req.body.type || "general",
-      read: false
+      read: false,
     });
 
     await inquiry.save();
 
     res.json({
       success: true,
-      inquiry
+      inquiry,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -233,7 +241,9 @@ app.post("/api/inquiries", async (req, res) => {
 // MARK AS READ
 app.put("/api/inquiries/:id/read", async (req, res) => {
   try {
-    await Inquiry.findByIdAndUpdate(req.params.id, { read: true });
+    await Inquiry.findByIdAndUpdate(req.params.id, {
+      read: true,
+    });
 
     res.json({
       success: true,
@@ -331,6 +341,7 @@ app.delete("/api/inquiries/:id", async (req, res) => {
 app.get("/api/categories", async (req, res) => {
   try {
     const data = await Category.find().sort({ createdAt: -1 });
+
     res.json(data);
   } catch (error) {
     res.status(500).json({
@@ -408,6 +419,16 @@ app.delete("/api/categories/:id", async (req, res) => {
       error: error.message,
     });
   }
+});
+
+/* ===========================
+   REACT FRONTEND ROUTE
+=========================== */
+/* ===========================
+   REACT FRONTEND ROUTE
+=========================== */
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
 
 /* ===========================
