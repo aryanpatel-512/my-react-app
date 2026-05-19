@@ -424,9 +424,6 @@ app.delete("/api/categories/:id", async (req, res) => {
 /* ===========================
    REACT FRONTEND ROUTE
 =========================== */
-/* ===========================
-   REACT FRONTEND ROUTE
-=========================== */
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
