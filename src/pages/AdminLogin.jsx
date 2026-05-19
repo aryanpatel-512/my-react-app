@@ -16,7 +16,7 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/login", {
+      const res = await fetch("https://my-react-app-production-b77b.up.railway.app/api/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

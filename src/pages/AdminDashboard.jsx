@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import "./AdminDashboard.css";
 import logo from "../assets/logo.png";
 
-const API = "http://localhost:5000";
+const API = "https://my-react-app-production-b77b.up.railway.app";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
