@@ -613,7 +613,13 @@ Sri Srinivasa Clean Rooms`;
                   <tbody>
                     {filteredProducts.map(item => (
                       <tr key={item._id}>
-                        <td><div className="adm-product-img"><img src={item.image} alt={item.title} onError={e => { e.target.src = "https://placehold.co/52x52/e6faf7/0f766e?text=IMG"; }} /></div></td>
+                        <td><div className="adm-product-img"><img
+  src={
+    item.image?.replace(
+      "https://my-react-app-production-b77b.up.railway.app",
+      window.location.origin
+    )
+  } alt={item.title} onError={e => { e.target.src = "https://placehold.co/52x52/e6faf7/0f766e?text=IMG"; }} /></div></td>
                         <td><span className="adm-product-name">{item.title}</span></td>
                         <td><span className="adm-cat-pill">{item.category}</span></td>
                         <td><span className="adm-price">{item.price}</span></td>
@@ -634,7 +640,13 @@ Sri Srinivasa Clean Rooms`;
                 <div><h2 className="adm-card__title">{editingProduct ? "Edit Product" : "Add New Product"}</h2><p className="adm-card__sub">{editingProduct ? `Editing: ${editingProduct.title}` : "Fill all required fields"}</p></div>
                 <button className="adm-btn adm-btn--ghost" onClick={() => { setEditingProduct(null); setActiveTab("products"); }}>← Back</button>
               </div>
-              {editingProduct?.image && (<div className="adm-edit-preview"><div className="adm-edit-preview__label">Current Image</div><img src={editingProduct.image} alt={editingProduct.title} className="adm-edit-preview__img" /></div>)}
+              {editingProduct?.image && (<div className="adm-edit-preview"><div className="adm-edit-preview__label">Current Image</div><img
+  src={
+    editingProduct.image?.replace(
+      "https://my-react-app-production-b77b.up.railway.app",
+      window.location.origin
+    )
+  } alt={editingProduct.title} className="adm-edit-preview__img" /></div>)}
               <form key={formKey} className="adm-form" onSubmit={editingProduct ? updateProduct : addProduct}>
                 <div className="adm-form__grid">
                   <div className="adm-form__field"><label>Product Name <span className="adm-req">*</span></label><input type="text" name="title" defaultValue={editingProduct?.title || ""} required placeholder="e.g., Wooden ICU Bed" /></div>
@@ -748,7 +760,13 @@ Sri Srinivasa Clean Rooms`;
                                 {categoryProducts.map(product => (
                                   <div key={product._id} className="category-product-item">
                                     <div className="category-product-image">
-                                      <img src={product.image} alt={product.title} />
+                                      <img
+  src={
+    product.image?.replace(
+      "https://my-react-app-production-b77b.up.railway.app",
+      window.location.origin
+    )
+  } alt={product.title} />
                                     </div>
                                     <div className="category-product-info">
                                       <h4>{product.title}</h4>
