@@ -11,34 +11,42 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+ const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
- try {
-  const res = await fetch(
-    `${window.location.origin}/api/admin/login`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
+  try {
+    const res = await fetch(
+      `${window.location.origin}/api/admin/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem("adminToken", data.token);
+
+      navigate("/admin/dashboard");
+    } else {
+      alert(data.message || "Invalid credentials");
     }
-  );
 
-  const data = await res.json();
-
-  if (data.success) {
-    localStorage.setItem("token", data.token);
+  } catch (err) {
+    console.log(err);
+    alert("Server error");
+  } finally {
+    setLoading(false);
   }
-} catch (err) {
-  console.log(err);
-}
-
+};
   return (
     <div className="admin-login-page">
       {/* Background elements */}
@@ -187,5 +195,4 @@ export default function AdminLogin() {
       </div>
     </div>
   );
-}
 }
