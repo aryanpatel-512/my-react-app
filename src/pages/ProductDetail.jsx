@@ -105,7 +105,7 @@ try {
 } finally {
   setSending(false);
 }
-
+};
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll);
@@ -211,7 +211,13 @@ try {
             {/* Left Column - Product Image */}
             <div className="pd-left-col">
               <div className="pd-main-image">
-                <img src={product.image} alt={product.title} />
+              <img
+  src={
+    product.image?.replace(
+      "https://my-react-app-production-b77b.up.railway.app",
+      window.location.origin
+    )
+  }/>
                 <div className="pd-image-badge">
                   <span>✦</span>
                   <div>
@@ -221,9 +227,27 @@ try {
                 </div>
               </div>
               <div className="pd-thumbnails">
-                <div className="pd-thumb active"><img src={product.image} alt={product.title} /></div>
-                <div className="pd-thumb"><img src={product.image} alt={product.title} /></div>
-                <div className="pd-thumb"><img src={product.image} alt={product.title} /></div>
+                <div className="pd-thumb active"><img
+  src={
+    product.image?.replace(
+      "https://my-react-app-production-b77b.up.railway.app",
+      window.location.origin
+    )
+  } /></div>
+                <div className="pd-thumb"><img
+  src={
+    product.image?.replace(
+      "https://my-react-app-production-b77b.up.railway.app",
+      window.location.origin
+    )
+  }/></div>
+                <div className="pd-thumb"><img
+  src={
+    product.image?.replace(
+      "https://my-react-app-production-b77b.up.railway.app",
+      window.location.origin
+    )
+  }/></div>
               </div>
             </div>
 
@@ -435,5 +459,4 @@ try {
       </footer>
     </div>
   );
-}
 }
