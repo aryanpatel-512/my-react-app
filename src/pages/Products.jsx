@@ -387,14 +387,20 @@ const response = await fetch(`${window.location.origin}/api/products`);
                   }}
                 >
                   <div className="product-card__img-wrap">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.target.src = "https://placehold.co/400x300/e6faf7/0f766e?text=No+Image";
-                      }}
-                    />
+                  <img
+  src={
+    item.image?.replace(
+      "https://my-react-app-production-b77b.up.railway.app",
+      window.location.origin
+    )
+  }
+  alt={item.title}
+  loading="lazy"
+  onError={(e) => {
+    e.target.src =
+      "https://placehold.co/400x300/e6faf7/0f766e?text=No+Image";
+  }}
+/>
                     <div className="product-card__img-overlay" />
                     <div className="product-card__category">
                       {item.category}
