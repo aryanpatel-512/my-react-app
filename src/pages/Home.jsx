@@ -163,7 +163,7 @@ export default function App() {
 
   const isVisible = (key) => visibleSections.has(key);
 
-const API = "https://my-react-app-production-b77b.up.railway.app";
+const API = window.location.origin;
 
 const handleFormSubmit = async (e) => {
   e.preventDefault();

@@ -24,7 +24,7 @@ export default function ProductDetail() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("https://my-react-app-production-b77b.up.railway.app/api/products");
+const response = await fetch(`${window.location.origin}/api/products`);
       const data = await response.json();
       setProducts(data);
       const found = data.find((item) => item._id === id);
@@ -49,35 +49,62 @@ export default function ProductDetail() {
       return;
     }
 
-    try {
-      setSending(true);
-      const res = await fetch("https://my-react-app-production-b77b.up.railway.app/api/inquiries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: quoteForm.name,
-          phone: quoteForm.phone,
-          email: quoteForm.email,
-          message: quoteForm.message || `Need quote for ${product?.title}`,
-          productId: product?._id,
-          productName: product?.title,
-          type: "product"
-        })
-      });
+try {
+  setSending(true);
 
-      const data = await res.json();
-      if (data.success) {
-        alert("✅ Inquiry sent successfully! We'll contact you soon.");
-        setQuoteForm({ name: "", phone: "", email: "", message: "" });
-      } else {
-        alert("❌ Failed to send inquiry. Please try again.");
-      }
-    } catch (error) {
-      alert("Server error. Please try again later.");
-    } finally {
-      setSending(false);
+  const res = await fetch(
+    `${window.location.origin}/api/inquiries`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        name: quoteForm.name,
+        phone: quoteForm.phone,
+        email: quoteForm.email,
+        message:
+          quoteForm.message ||
+          `Need quote for ${product?.title}`,
+
+        productId: product?._id,
+        productName: product?.title,
+        type: "product",
+      }),
     }
-  };
+  );
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert(
+      "✅ Inquiry sent successfully! We'll contact you soon."
+    );
+
+    setQuoteForm({
+      name: "",
+      phone: "",
+      email: "",
+      message: "",
+    });
+
+  } else {
+    alert(
+      "❌ Failed to send inquiry. Please try again."
+    );
+  }
+
+} catch (error) {
+  console.log(error);
+
+  alert(
+    "Server error. Please try again later."
+  );
+
+} finally {
+  setSending(false);
+}
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -408,4 +435,5 @@ export default function ProductDetail() {
       </footer>
     </div>
   );
+}
 }

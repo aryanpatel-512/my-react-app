@@ -15,30 +15,29 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
 
-    try {
-      const res = await fetch("https://my-react-app-production-b77b.up.railway.app/api/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        localStorage.setItem("adminToken", data.token);
-        navigate("/admin/dashboard");
-      } else {
-        alert(data.message || "Invalid Credentials");
-      }
-    } catch (error) {
-      alert("Server Error");
-      console.log(error);
-    } finally {
-      setLoading(false);
+ try {
+  const res = await fetch(
+    `${window.location.origin}/api/admin/login`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
     }
-  };
+  );
+
+  const data = await res.json();
+
+  if (data.success) {
+    localStorage.setItem("token", data.token);
+  }
+} catch (err) {
+  console.log(err);
+}
 
   return (
     <div className="admin-login-page">
@@ -188,4 +187,5 @@ export default function AdminLogin() {
       </div>
     </div>
   );
+}
 }

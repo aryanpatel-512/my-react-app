@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 require("dotenv").config();
 
 const Product = require("./models/Product");
@@ -21,9 +22,18 @@ app.use(express.json());
 app.use("/api/admin", adminRoutes);
 
 /* ===========================
+   UPLOADS DIRECTORY
+=========================== */
+const uploadsPath = path.join(__dirname, "uploads");
+
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true });
+}
+
+/* ===========================
    STATIC UPLOADS
 =========================== */
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(uploadsPath));
 
 /* ===========================
    FRONTEND DIST SERVE
@@ -35,7 +45,7 @@ app.use(express.static(path.join(__dirname, "../dist")));
 =========================== */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, uploadsPath);
   },
 
   filename: (req, file, cb) => {
@@ -96,6 +106,33 @@ app.get("/api/test", (req, res) => {
 });
 
 /* ===========================
+   FIX OLD IMAGE URLS
+=========================== */
+app.get("/fix-images", async (req, res) => {
+  try {
+    const products = await Product.find();
+
+    for (const product of products) {
+      if (
+        product.image &&
+        product.image.includes("localhost:5000")
+      ) {
+        product.image = product.image.replace(
+          "http://localhost:5000",
+          "https://sri-srinivasa-clean-room.onrender.com"
+        );
+
+        await product.save();
+      }
+    }
+
+    res.send("✅ Images Fixed Successfully");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+/* ===========================
    PRODUCTS
 =========================== */
 
@@ -132,7 +169,9 @@ app.post("/api/products", upload.single("image"), async (req, res) => {
 // GET PRODUCTS
 app.get("/api/products", async (req, res) => {
   try {
-    const data = await Product.find().sort({ createdAt: -1 });
+    const data = await Product.find().sort({
+      createdAt: -1,
+    });
 
     res.json(data);
   } catch (error) {
@@ -144,37 +183,44 @@ app.get("/api/products", async (req, res) => {
 });
 
 // UPDATE PRODUCT
-app.put("/api/products/:id", upload.single("image"), async (req, res) => {
-  try {
-    const updateData = {
-      title: req.body.title,
-      price: req.body.price,
-      category: req.body.category,
-      desc: req.body.desc,
-    };
+app.put(
+  "/api/products/:id",
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const updateData = {
+        title: req.body.title,
+        price: req.body.price,
+        category: req.body.category,
+        desc: req.body.desc,
+      };
 
-    if (req.file) {
-      updateData.image = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+      if (req.file) {
+        updateData.image = `${req.protocol}://${req.get(
+          "host"
+        )}/uploads/${req.file.filename}`;
+      }
+
+      const updatedProduct =
+        await Product.findByIdAndUpdate(
+          req.params.id,
+          updateData,
+          { new: true }
+        );
+
+      res.json({
+        success: true,
+        message: "Product Updated Successfully",
+        product: updatedProduct,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+      });
     }
-
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      { new: true }
-    );
-
-    res.json({
-      success: true,
-      message: "Product Updated Successfully",
-      product: updatedProduct,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
   }
-});
+);
 
 // DELETE PRODUCT
 app.delete("/api/products/:id", async (req, res) => {
@@ -200,7 +246,9 @@ app.delete("/api/products/:id", async (req, res) => {
 // GET ALL INQUIRIES
 app.get("/api/inquiries", async (req, res) => {
   try {
-    const data = await Inquiry.find().sort({ createdAt: -1 });
+    const data = await Inquiry.find().sort({
+      createdAt: -1,
+    });
 
     res.json(data);
   } catch (error) {
@@ -340,7 +388,9 @@ app.delete("/api/inquiries/:id", async (req, res) => {
 // GET ALL CATEGORIES
 app.get("/api/categories", async (req, res) => {
   try {
-    const data = await Category.find().sort({ createdAt: -1 });
+    const data = await Category.find().sort({
+      createdAt: -1,
+    });
 
     res.json(data);
   } catch (error) {
@@ -421,18 +471,19 @@ app.delete("/api/categories/:id", async (req, res) => {
   }
 });
 
-
 /* ===========================
    REACT FRONTEND ROUTE
 =========================== */
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "../dist/index.html"));
+  res.sendFile(
+    path.join(__dirname, "../dist/index.html")
+  );
 });
 
 /* ===========================
    START SERVER
 =========================== */
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
