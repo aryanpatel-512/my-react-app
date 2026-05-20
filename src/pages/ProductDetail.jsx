@@ -415,7 +415,15 @@ try {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   navigate(`/product/${item._id}`);
                 }}>
-                  <div className="related-image"><img src={item.image} alt={item.title} /><span className="related-category">{item.category}</span></div>
+                  <div className="related-image"><img
+  src={
+    item.image?.replace(
+      "https://my-react-app-production-b77b.up.railway.app",
+      window.location.origin
+    )
+  }
+  alt={item.title}
+/><span className="related-category">{item.category}</span></div>
                   <div className="related-info"><h4>{item.title.length > 35 ? item.title.substring(0, 35) + "..." : item.title}</h4><p>{item.price}</p><span className="related-view">View Details →</span></div>
                 </div>
               ))}
