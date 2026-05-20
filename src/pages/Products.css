@@ -323,7 +323,7 @@ body {
 }
 
 .mobile-drawer__inner {
-  padding: 12px 24px 40px;
+  padding: 0px 24px 40px;
   display: flex;
   flex-direction: column;
   gap: 4px;
