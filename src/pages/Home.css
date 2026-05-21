@@ -465,7 +465,7 @@ button {
 .mobile-drawer {
   display: none;
   position: fixed;
-  top: 80px;
+  top: 0px;
   left: 0;
   right: 0;
   background: rgba(2, 12, 11, 0.97);
