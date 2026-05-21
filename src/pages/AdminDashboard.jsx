@@ -15,6 +15,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("products");
   const [editingProduct, setEditingProduct] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -38,6 +39,37 @@ export default function AdminDashboard() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Check if mobile view
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth > 768) {
+        setMobileSidebarOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    if (mobileSidebarOpen && isMobile) {
+      const handleClickOutside = (e) => {
+        if (!e.target.closest('.adm-sidebar') && !e.target.closest('.adm-mobile-menu-btn')) {
+          setMobileSidebarOpen(false);
+        }
+      };
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [mobileSidebarOpen, isMobile]);
+
+  const toggleMobileSidebar = () => {
+    setMobileSidebarOpen(!mobileSidebarOpen);
+  };
 
   // Status options
   const statusOptions = [
@@ -96,7 +128,6 @@ export default function AdminDashboard() {
     } catch (err) { console.warn("fetchInquiries:", err.message); }
   }, []);
 
-  // Toggle category expand/collapse
   const toggleCategory = (categoryId) => {
     setExpandedCategories(prev => ({
       ...prev,
@@ -104,12 +135,10 @@ export default function AdminDashboard() {
     }));
   };
 
-  // Get products by category
   const getProductsByCategory = (categoryName) => {
     return products.filter(product => product.category === categoryName);
   };
 
-  // Generate WhatsApp message
   const getWhatsAppMessage = (inq) => {
     const msg = 
 `Sri Srinivasa Clean Rooms
@@ -145,7 +174,6 @@ Thank you for choosing Sri Srinivasa Clean Rooms`;
     return encodeURIComponent(msg);
   };
 
-  // Generate Email
   const getEmailSubject = (inq) => {
     return encodeURIComponent(`Inquiry from ${inq.name} - ${inq.productName || "Product Inquiry"} - Sri Srinivasa Clean Rooms`);
   };
@@ -205,7 +233,6 @@ Sri Srinivasa Clean Rooms`;
     return encodeURIComponent(body);
   };
 
-  // Add Category
   const addCategory = async () => {
     if (!newCategory.trim()) {
       showToast("Please enter a category name", "error");
@@ -231,7 +258,6 @@ Sri Srinivasa Clean Rooms`;
     }
   };
 
-  // Delete Category
   const deleteCategory = async (id) => {
     if (!window.confirm("Delete this category? Products in this category will be affected.")) return;
     try {
@@ -259,7 +285,6 @@ Sri Srinivasa Clean Rooms`;
     fetchCategories();
   }, [navigate]);
 
-  // Safe CSV Export
   const exportToCSV = () => {
     const headers = ["Date", "Name", "Phone", "Email", "Product", "Message", "Status", "Priority", "Lead Type", "Notes"];
     
@@ -293,7 +318,6 @@ Sri Srinivasa Clean Rooms`;
     showToast("Exported to CSV successfully");
   };
 
-  // Update inquiry status
   const updateInquiryStatus = async (id, status) => {
     try {
       const res = await fetch(`${API}/api/inquiries/${id}/status`, {
@@ -308,7 +332,6 @@ Sri Srinivasa Clean Rooms`;
     } catch (err) { console.error(err); }
   };
 
-  // Update inquiry priority
   const updateInquiryPriority = async (id, priority) => {
     try {
       const res = await fetch(`${API}/api/inquiries/${id}/priority`, {
@@ -323,7 +346,6 @@ Sri Srinivasa Clean Rooms`;
     } catch (err) { console.error(err); }
   };
 
-  // Add note to inquiry
   const addNote = async () => {
     if (!noteText.trim()) return;
     try {
@@ -440,7 +462,6 @@ Sri Srinivasa Clean Rooms`;
 
   const logout = () => { localStorage.removeItem("adminToken"); navigate("/admin/login"); };
 
-  // Filter inquiries with Lead Type
   const filteredInquiries = inquiries.filter(inq => {
     const matchesSearch = !inquirySearch || 
       inq.name?.toLowerCase().includes(inquirySearch.toLowerCase()) ||
@@ -472,7 +493,6 @@ Sri Srinivasa Clean Rooms`;
     return matchesSearch && matchesStatus && matchesPriority && matchesQuick && matchesType;
   });
 
-  // Pagination
   const paginatedInquiries = filteredInquiries.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -502,7 +522,6 @@ Sri Srinivasa Clean Rooms`;
     { id:"categories", label:"Categories", badge: categories.length, icon: "🏷️" },
     { id:"inquiries", label:"Inquiries", badge: unreadCount || null, badgeWarn: true, icon: "💬" },
     { id:"analytics", label:"Analytics", badge: null, icon: "📊" },
-    
   ];
 
   const getPageTitle = () => {
@@ -519,8 +538,17 @@ Sri Srinivasa Clean Rooms`;
         </div>
       )}
 
+      {/* Mobile Menu Button */}
+      <button className="adm-mobile-menu-btn" onClick={toggleMobileSidebar}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
       {/* Sidebar */}
-      <aside className={`adm-sidebar ${sidebarCollapsed ? "adm-sidebar--collapsed" : ""}`}>
+      <aside className={`adm-sidebar ${sidebarCollapsed ? "adm-sidebar--collapsed" : ""} ${mobileSidebarOpen && isMobile ? "adm-sidebar--mobile-open" : ""}`}>
         <div className="adm-sidebar__top">
           <div className="adm-brand">
             <div className="adm-brand__icon">
@@ -533,18 +561,24 @@ Sri Srinivasa Clean Rooms`;
               </div>
             )}
           </div>
-          <button className="adm-sidebar__toggle" onClick={() => setSidebarCollapsed(c => !c)}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              {sidebarCollapsed ? <path d="M9 18l6-6-6-6"/> : <path d="M15 18l-6-6 6-6"/>}
-            </svg>
-          </button>
+          {!isMobile && (
+            <button className="adm-sidebar__toggle" onClick={() => setSidebarCollapsed(c => !c)}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                {sidebarCollapsed ? <path d="M9 18l6-6-6-6"/> : <path d="M15 18l-6-6 6-6"/>}
+              </svg>
+            </button>
+          )}
         </div>
 
         <nav className="adm-sidebar__nav">
           {navItems.map(item => (
             <button key={item.id}
               className={`adm-nav-btn ${activeTab === item.id ? "adm-nav-btn--active" : ""}`}
-              onClick={() => { setActiveTab(item.id); if (item.id !== "add-product") setEditingProduct(null); }}
+              onClick={() => { 
+                setActiveTab(item.id); 
+                if (item.id !== "add-product") setEditingProduct(null);
+                if (isMobile) setMobileSidebarOpen(false);
+              }}
               title={sidebarCollapsed ? item.label : ""}
             >
               <span className="adm-nav-btn__icon">{item.icon}</span>
@@ -568,6 +602,11 @@ Sri Srinivasa Clean Rooms`;
           </button>
         </div>
       </aside>
+
+      {/* Overlay for mobile sidebar */}
+      {mobileSidebarOpen && isMobile && (
+        <div className="adm-sidebar-overlay" onClick={() => setMobileSidebarOpen(false)}></div>
+      )}
 
       {/* Main Content */}
       <main className="adm-main">
@@ -603,7 +642,7 @@ Sri Srinivasa Clean Rooms`;
             <div className="adm-card">
               <div className="adm-card__header">
                 <div><h2 className="adm-card__title">All Products</h2><p className="adm-card__sub">{filteredProducts.length} items in catalog</p></div>
-                <button className="adm-btn adm-btn--primary" onClick={() => { setEditingProduct(null); setFormKey(k => k + 1); setActiveTab("add-product"); }}>+ Add Product</button>
+                <button className="adm-btn adm-btn--primary" onClick={() => { setEditingProduct(null); setFormKey(k => k + 1); setActiveTab("add-product"); if(isMobile) setMobileSidebarOpen(false); }}>+ Add Product</button>
               </div>
               <div className="adm-table-wrap">
                 <table className="adm-table">
@@ -613,13 +652,7 @@ Sri Srinivasa Clean Rooms`;
                   <tbody>
                     {filteredProducts.map(item => (
                       <tr key={item._id}>
-                        <td><div className="adm-product-img"><img
-  src={
-    item.image?.replace(
-      "https://my-react-app-production-b77b.up.railway.app",
-      window.location.origin
-    )
-  } alt={item.title} onError={e => { e.target.src = "https://placehold.co/52x52/e6faf7/0f766e?text=IMG"; }} /></div></td>
+                        <td><div className="adm-product-img"><img src={item.image?.replace("https://my-react-app-production-b77b.up.railway.app", window.location.origin)} alt={item.title} onError={e => { e.target.src = "https://placehold.co/52x52/e6faf7/0f766e?text=IMG"; }} /></div></td>
                         <td><span className="adm-product-name">{item.title}</span></td>
                         <td><span className="adm-cat-pill">{item.category}</span></td>
                         <td><span className="adm-price">{item.price}</span></td>
@@ -640,13 +673,7 @@ Sri Srinivasa Clean Rooms`;
                 <div><h2 className="adm-card__title">{editingProduct ? "Edit Product" : "Add New Product"}</h2><p className="adm-card__sub">{editingProduct ? `Editing: ${editingProduct.title}` : "Fill all required fields"}</p></div>
                 <button className="adm-btn adm-btn--ghost" onClick={() => { setEditingProduct(null); setActiveTab("products"); }}>← Back</button>
               </div>
-              {editingProduct?.image && (<div className="adm-edit-preview"><div className="adm-edit-preview__label">Current Image</div><img
-  src={
-    editingProduct.image?.replace(
-      "https://my-react-app-production-b77b.up.railway.app",
-      window.location.origin
-    )
-  } alt={editingProduct.title} className="adm-edit-preview__img" /></div>)}
+              {editingProduct?.image && (<div className="adm-edit-preview"><div className="adm-edit-preview__label">Current Image</div><img src={editingProduct.image?.replace("https://my-react-app-production-b77b.up.railway.app", window.location.origin)} alt={editingProduct.title} className="adm-edit-preview__img" /></div>)}
               <form key={formKey} className="adm-form" onSubmit={editingProduct ? updateProduct : addProduct}>
                 <div className="adm-form__grid">
                   <div className="adm-form__field"><label>Product Name <span className="adm-req">*</span></label><input type="text" name="title" defaultValue={editingProduct?.title || ""} required placeholder="e.g., Wooden ICU Bed" /></div>
@@ -654,9 +681,7 @@ Sri Srinivasa Clean Rooms`;
                   <div className="adm-form__field"><label>Category <span className="adm-req">*</span></label>
                     <select name="category" defaultValue={editingProduct?.category || ""} required>
                       <option value="">Select Category</option>
-                      {categories.map(cat => (
-                        <option key={cat._id} value={cat.name}>{cat.name}</option>
-                      ))}
+                      {categories.map(cat => (<option key={cat._id} value={cat.name}>{cat.name}</option>))}
                     </select>
                   </div>
                   <div className="adm-form__field"><label>Product Image{!editingProduct && <span className="adm-req"> *</span>}</label><input type="file" name="image" accept="image/*" className="adm-file-input" />{editingProduct && <p className="adm-form__hint">Leave empty to keep current image</p>}</div>
@@ -671,34 +696,19 @@ Sri Srinivasa Clean Rooms`;
           {activeTab === "categories" && (
             <div className="adm-card">
               <div className="adm-card__header">
-                <div>
-                  <h2 className="adm-card__title">Manage Categories</h2>
-                  <p className="adm-card__sub">{categories.length} total categories - Click on any category to view its products</p>
-                </div>
+                <div><h2 className="adm-card__title">Manage Categories</h2><p className="adm-card__sub">{categories.length} total categories - Click on any category to view its products</p></div>
               </div>
               
               <div className="category-add-section">
                 <div className="category-add-form">
-                  <input 
-                    type="text" 
-                    value={newCategory} 
-                    onChange={(e) => setNewCategory(e.target.value)} 
-                    placeholder="Enter new category name..."
-                    className="category-input"
-                    onKeyPress={(e) => e.key === 'Enter' && addCategory()}
-                  />
-                  <button onClick={addCategory} className="adm-btn adm-btn--primary">
-                    + Add Category
-                  </button>
+                  <input type="text" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Enter new category name..." className="category-input" onKeyPress={(e) => e.key === 'Enter' && addCategory()} />
+                  <button onClick={addCategory} className="adm-btn adm-btn--primary">+ Add Category</button>
                 </div>
               </div>
 
               <div className="categories-list-expandable">
                 {categories.length === 0 ? (
-                  <div className="adm-empty">
-                    <div className="adm-empty__icon">🏷️</div>
-                    <p>No categories yet. Add your first category above.</p>
-                  </div>
+                  <div className="adm-empty"><div className="adm-empty__icon">🏷️</div><p>No categories yet. Add your first category above.</p></div>
                 ) : (
                   categories.map((cat, i) => {
                     const count = getCategoryCount(cat.name);
@@ -707,10 +717,7 @@ Sri Srinivasa Clean Rooms`;
                     
                     return (
                       <div key={cat._id} className="category-expandable-item">
-                        <div 
-                          className="category-expandable-header"
-                          onClick={() => toggleCategory(cat._id)}
-                        >
+                        <div className="category-expandable-header" onClick={() => toggleCategory(cat._id)}>
                           <div className="category-expandable-left">
                             <span className="expand-icon">{isExpanded ? "▼" : "▶"}</span>
                             <span className="category-number">{String(i + 1).padStart(2, "0")}</span>
@@ -720,79 +727,23 @@ Sri Srinivasa Clean Rooms`;
                             </div>
                           </div>
                           <div className="category-expandable-right">
-                            <span className={`category-status ${count > 0 ? "active" : "empty"}`}>
-                              {count > 0 ? "Active" : "Empty"}
-                            </span>
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteCategory(cat._id);
-                              }} 
-                              className="adm-icon-btn adm-icon-btn--del"
-                              title="Delete Category"
-                            >
-                              🗑️
-                            </button>
+                            <span className={`category-status ${count > 0 ? "active" : "empty"}`}>{count > 0 ? "Active" : "Empty"}</span>
+                            <button onClick={(e) => { e.stopPropagation(); deleteCategory(cat._id); }} className="adm-icon-btn adm-icon-btn--del" title="Delete Category">🗑️</button>
                           </div>
                         </div>
                         
                         {isExpanded && (
                           <div className="category-products-list">
-                            <div className="category-products-header">
-                              <span>Products in "{cat.name}"</span>
-                              <span>{categoryProducts.length} items</span>
-                            </div>
+                            <div className="category-products-header"><span>Products in "{cat.name}"</span><span>{categoryProducts.length} items</span></div>
                             {categoryProducts.length === 0 ? (
-                              <div className="category-products-empty">
-                                <p>No products in this category yet.</p>
-                                <button 
-                                  className="adm-btn adm-btn--sm adm-btn--primary"
-                                  onClick={() => {
-                                    setActiveTab("add-product");
-                                    setEditingProduct(null);
-                                  }}
-                                >
-                                  + Add Product
-                                </button>
-                              </div>
+                              <div className="category-products-empty"><p>No products in this category yet.</p><button className="adm-btn adm-btn--sm adm-btn--primary" onClick={() => { setActiveTab("add-product"); setEditingProduct(null); }}>+ Add Product</button></div>
                             ) : (
                               <div className="category-products-grid">
                                 {categoryProducts.map(product => (
                                   <div key={product._id} className="category-product-item">
-                                    <div className="category-product-image">
-                                      <img
-  src={
-    product.image?.replace(
-      "https://my-react-app-production-b77b.up.railway.app",
-      window.location.origin
-    )
-  } alt={product.title} />
-                                    </div>
-                                    <div className="category-product-info">
-                                      <h4>{product.title}</h4>
-                                      <p className="product-price">{product.price}</p>
-                                      <p className="product-desc">{product.desc?.substring(0, 60)}...</p>
-                                    </div>
-                                    <div className="category-product-actions">
-                                      <button 
-                                        className="adm-icon-btn adm-icon-btn--edit"
-                                        onClick={() => {
-                                          setEditingProduct(product);
-                                          setFormKey(k => k + 1);
-                                          setActiveTab("add-product");
-                                        }}
-                                        title="Edit Product"
-                                      >
-                                        ✏️
-                                      </button>
-                                      <button 
-                                        className="adm-icon-btn adm-icon-btn--del"
-                                        onClick={() => deleteProduct(product._id)}
-                                        title="Delete Product"
-                                      >
-                                        🗑️
-                                      </button>
-                                    </div>
+                                    <div className="category-product-image"><img src={product.image?.replace("https://my-react-app-production-b77b.up.railway.app", window.location.origin)} alt={product.title} /></div>
+                                    <div className="category-product-info"><h4>{product.title}</h4><p className="product-price">{product.price}</p><p className="product-desc">{product.desc?.substring(0, 60)}...</p></div>
+                                    <div className="category-product-actions"><button className="adm-icon-btn adm-icon-btn--edit" onClick={() => { setEditingProduct(product); setFormKey(k => k + 1); setActiveTab("add-product"); }} title="Edit Product">✏️</button><button className="adm-icon-btn adm-icon-btn--del" onClick={() => deleteProduct(product._id)} title="Delete Product">🗑️</button></div>
                                   </div>
                                 ))}
                               </div>
@@ -812,46 +763,15 @@ Sri Srinivasa Clean Rooms`;
             <div className="adm-card">
               <div className="adm-card__header">
                 <div><h2 className="adm-card__title">Customer Inquiries</h2><p className="adm-card__sub">{unreadCount} unread · {inquiries.length} total</p></div>
-                <div className="inquiry-actions-header">
-                  <button className="adm-btn adm-btn--sm adm-btn--primary" onClick={exportToCSV}>
-                    Export to CSV
-                  </button>
-                </div>
+                <div className="inquiry-actions-header"><button className="adm-btn adm-btn--sm adm-btn--primary" onClick={exportToCSV}>Export to CSV</button></div>
               </div>
 
               <div className="inquiry-filters">
-                <div className="filter-group">
-                  <select value={leadType} onChange={e => { setLeadType(e.target.value); setCurrentPage(1); }} className="filter-select">
-                    <option value="all">All Leads</option>
-                    <option value="product">Product Leads</option>
-                    <option value="general">General Leads</option>
-                  </select>
-                </div>
-                <div className="filter-group">
-                  <select value={inquiryFilter} onChange={e => { setInquiryFilter(e.target.value); setCurrentPage(1); }} className="filter-select">
-                    <option value="all">All Inquiries</option>
-                    <option value="unread">Unread Only</option>
-                    <option value="today">Today</option>
-                    <option value="week">This Week</option>
-                    <option value="closed">Closed</option>
-                    <option value="hot">Hot Leads</option>
-                  </select>
-                </div>
-                <div className="filter-group">
-                  <select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }} className="filter-select">
-                    <option value="all">All Status</option>
-                    {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                  </select>
-                </div>
-                <div className="filter-group">
-                  <select value={priorityFilter} onChange={e => { setPriorityFilter(e.target.value); setCurrentPage(1); }} className="filter-select">
-                    <option value="all">All Priorities</option>
-                    {priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                  </select>
-                </div>
-                <div className="filter-group">
-                  <input type="text" placeholder="Search by name, phone, email, product..." value={inquirySearch} onChange={e => { setInquirySearch(e.target.value); setCurrentPage(1); }} className="filter-search" />
-                </div>
+                <div className="filter-group"><select value={leadType} onChange={e => { setLeadType(e.target.value); setCurrentPage(1); }} className="filter-select"><option value="all">All Leads</option><option value="product">Product Leads</option><option value="general">General Leads</option></select></div>
+                <div className="filter-group"><select value={inquiryFilter} onChange={e => { setInquiryFilter(e.target.value); setCurrentPage(1); }} className="filter-select"><option value="all">All Inquiries</option><option value="unread">Unread Only</option><option value="today">Today</option><option value="week">This Week</option><option value="closed">Closed</option><option value="hot">Hot Leads</option></select></div>
+                <div className="filter-group"><select value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }} className="filter-select"><option value="all">All Status</option>{statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}</select></div>
+                <div className="filter-group"><select value={priorityFilter} onChange={e => { setPriorityFilter(e.target.value); setCurrentPage(1); }} className="filter-select"><option value="all">All Priorities</option>{priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}</select></div>
+                <div className="filter-group"><input type="text" placeholder="Search by name, phone, email, product..." value={inquirySearch} onChange={e => { setInquirySearch(e.target.value); setCurrentPage(1); }} className="filter-search" /></div>
               </div>
 
               <div className="inquiries-list">
@@ -869,39 +789,12 @@ Sri Srinivasa Clean Rooms`;
                       <div key={inq._id} className={`adm-inq ${!inq.read ? "adm-inq--unread" : ""}`}>
                         <div className="adm-inq__header">
                           <div className="adm-inq__avatar">{inq.name?.[0]?.toUpperCase() || "?"}</div>
-                          <div className="adm-inq__meta">
-                            <strong>{inq.name}</strong>
-                            <span>{inq.email || "No email"} {inq.phone && `· ${inq.phone}`}</span>
-                            {inq.productName && <span className="inq-product-tag">Product: {inq.productName}</span>}
-                          </div>
-                          <div className="adm-inq__right">
-                            <div className="inq-badges">
-                              <span className={`lead-type-badge ${inq.type === "product" ? "badge-product" : "badge-general"}`}>
-                                {inq.type === "product" ? "Product Lead" : "General Lead"}
-                              </span>
-                              <select className="status-select" value={inq.status || "new"} style={{ background: statusStyle.bg, color: statusStyle.color }} onChange={(e) => updateInquiryStatus(inq._id, e.target.value)}>
-                                {statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                              </select>
-                              <select className="priority-select" value={inq.priority || "normal"} style={{ background: priorityStyle.bg, color: priorityStyle.color }} onChange={(e) => updateInquiryPriority(inq._id, e.target.value)}>
-                                {priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                              </select>
-                            </div>
-                            <span className="adm-inq__date">{inq.createdAt ? new Date(inq.createdAt).toLocaleString() : "—"}</span>
-                          </div>
+                          <div className="adm-inq__meta"><strong>{inq.name}</strong><span>{inq.email || "No email"} {inq.phone && `· ${inq.phone}`}</span>{inq.productName && <span className="inq-product-tag">Product: {inq.productName}</span>}</div>
+                          <div className="adm-inq__right"><div className="inq-badges"><span className={`lead-type-badge ${inq.type === "product" ? "badge-product" : "badge-general"}`}>{inq.type === "product" ? "Product Lead" : "General Lead"}</span><select className="status-select" value={inq.status || "new"} style={{ background: statusStyle.bg, color: statusStyle.color }} onChange={(e) => updateInquiryStatus(inq._id, e.target.value)}>{statusOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}</select><select className="priority-select" value={inq.priority || "normal"} style={{ background: priorityStyle.bg, color: priorityStyle.color }} onChange={(e) => updateInquiryPriority(inq._id, e.target.value)}>{priorityOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}</select></div><span className="adm-inq__date">{inq.createdAt ? new Date(inq.createdAt).toLocaleString() : "—"}</span></div>
                         </div>
                         <div className="adm-inq__msg">{inq.message}</div>
                         
-                        {inq.notes && inq.notes.length > 0 && (
-                          <div className="inq-notes">
-                            <div className="inq-notes__title">Notes</div>
-                            {inq.notes.map((note, idx) => (
-                              <div key={idx} className="inq-note">
-                                <span className="inq-note__date">{new Date(note.createdAt).toLocaleString()}</span>
-                                <p>{note.note}</p>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        {inq.notes && inq.notes.length > 0 && (<div className="inq-notes"><div className="inq-notes__title">Notes</div>{inq.notes.map((note, idx) => (<div key={idx} className="inq-note"><span className="inq-note__date">{new Date(note.createdAt).toLocaleString()}</span><p>{note.note}</p></div>))}</div>)}
                         
                         <div className="adm-inq__actions">
                           {!inq.read && <button className="adm-btn adm-btn--sm adm-btn--primary" onClick={() => markAsRead(inq._id)}>Mark as Read</button>}
@@ -934,18 +827,6 @@ Sri Srinivasa Clean Rooms`;
               <div className="adm-chart-card"><h3>Summary</h3><div className="adm-activity"><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Total products</p><span>{products.length} products</span></div></div><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Active categories</p><span>{categories.filter(c => getCategoryCount(c.name) > 0).length} of {categories.length}</span></div></div><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Customer inquiries</p><span>{inquiries.length} total</span></div></div><div className="adm-activity__item"><div className="adm-activity__dot" /><div><p>Unread inquiries</p><span>{unreadCount} pending</span></div></div></div></div>
             </div>
           )}
-
-          {/* Settings Tab */}
-          {activeTab === "settings" && (
-            <div className="adm-card">
-              <div className="adm-card__header"><div><h2 className="adm-card__title">Settings</h2><p className="adm-card__sub">Manage admin profile and preferences</p></div></div>
-              <form className="adm-form" onSubmit={e => { e.preventDefault(); showToast("Settings saved!"); }}>
-                <div className="adm-form__section"><h4 className="adm-form__section-title">Profile Information</h4><div className="adm-form__grid"><div className="adm-form__field"><label>Full Name</label><input type="text" defaultValue="Administrator" /></div><div className="adm-form__field"><label>Email Address</label><input type="email" defaultValue="admin@srisrinivasa.com" /></div></div></div>
-                <div className="adm-form__section"><h4 className="adm-form__section-title">Change Password</h4><div className="adm-form__grid"><div className="adm-form__field"><label>Current Password</label><input type="password" placeholder="••••••••" /></div><div className="adm-form__field"><label>New Password</label><input type="password" placeholder="••••••••" /></div><div className="adm-form__field"><label>Confirm Password</label><input type="password" placeholder="••••••••" /></div></div></div>
-                <div className="adm-form__actions"><button type="submit" className="adm-btn adm-btn--primary adm-btn--lg">Save Changes</button><button type="button" className="adm-btn adm-btn--ghost">Cancel</button></div>
-              </form>
-            </div>
-          )}
         </div>
       </main>
 
@@ -953,17 +834,8 @@ Sri Srinivasa Clean Rooms`;
       {showNotesModal && selectedInquiry && (
         <div className="modal-overlay" onClick={() => { setShowNotesModal(false); setNoteText(""); }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Add Note for {selectedInquiry.name}</h3>
-              <button className="modal-close" onClick={() => { setShowNotesModal(false); setNoteText(""); }}>✕</button>
-            </div>
-            <div className="modal-body">
-              <textarea rows="4" placeholder="Enter your note here..." value={noteText} onChange={(e) => setNoteText(e.target.value)} className="note-textarea"></textarea>
-              <div className="modal-actions">
-                <button className="adm-btn adm-btn--primary" onClick={() => { addNote(); setShowNotesModal(false); }}>Add Note</button>
-                <button className="adm-btn adm-btn--ghost" onClick={() => { setShowNotesModal(false); setNoteText(""); }}>Cancel</button>
-              </div>
-            </div>
+            <div className="modal-header"><h3>Add Note for {selectedInquiry.name}</h3><button className="modal-close" onClick={() => { setShowNotesModal(false); setNoteText(""); }}>✕</button></div>
+            <div className="modal-body"><textarea rows="4" placeholder="Enter your note here..." value={noteText} onChange={(e) => setNoteText(e.target.value)} className="note-textarea"></textarea><div className="modal-actions"><button className="adm-btn adm-btn--primary" onClick={() => { addNote(); setShowNotesModal(false); }}>Add Note</button><button className="adm-btn adm-btn--ghost" onClick={() => { setShowNotesModal(false); setNoteText(""); }}>Cancel</button></div></div>
           </div>
         </div>
       )}
