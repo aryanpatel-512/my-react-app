@@ -1099,3 +1099,470 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+
+
+/* Add at the end of your product detail CSS - Enhanced Responsive */
+
+/* Extra Small Devices (320px - 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .product-detail-page {
+    padding-top: 60px;
+  }
+
+  .pd-hero {
+    padding: 20px 0 30px;
+  }
+
+  /* Three column layout becomes single column */
+  .pd-main-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .pd-left-col {
+    position: static;
+  }
+
+  .pd-main-image {
+    aspect-ratio: 1/1;
+  }
+
+  .pd-thumbnails {
+    justify-content: center;
+  }
+
+  .pd-thumb {
+    width: 60px;
+    height: 60px;
+  }
+
+  .pd-title {
+    font-size: 22px;
+  }
+
+  .pd-current-price {
+    font-size: 28px;
+  }
+
+  .pd-features-grid-2col {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-actions-box {
+    flex-direction: column;
+  }
+
+  .pd-btn-wa,
+  .pd-btn-call {
+    width: 100%;
+  }
+
+  .pd-share-box {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pd-right-col {
+    position: static;
+  }
+
+  .pd-quote-card {
+    padding: 20px;
+  }
+
+  .pd-quote-card h3 {
+    font-size: 18px;
+  }
+
+  .quote-price {
+    font-size: 20px;
+  }
+
+  /* Sections */
+  .pd-section {
+    padding: 40px 0;
+  }
+
+  .pd-section-header h2 {
+    font-size: 24px;
+  }
+
+  /* Specifications */
+  .pd-specs-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .pd-spec-card {
+    padding: 16px;
+  }
+
+  /* Benefits grid */
+  .pd-benefits-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .pd-benefit-card {
+    padding: 20px;
+  }
+
+  .benefit-icon {
+    font-size: 36px;
+  }
+
+  .pd-benefit-card h4 {
+    font-size: 16px;
+  }
+
+  /* Downloads section */
+  .pd-downloads {
+    flex-direction: column;
+    padding: 30px 20px;
+    text-align: center;
+  }
+
+  .pd-downloads-content h3 {
+    font-size: 18px;
+  }
+
+  .pd-downloads-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .pd-download-btn {
+    justify-content: center;
+  }
+
+  /* Related products */
+  .pd-related-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .related-image {
+    height: 200px;
+  }
+
+  /* CTA Banner */
+  .pd-cta-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .pd-cta-text h2 {
+    font-size: 22px;
+  }
+
+  .pd-cta-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-white,
+  .btn-outline-white {
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+/* 320px specific */
+@media (max-width: 320px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .pd-title {
+    font-size: 20px;
+  }
+
+  .pd-breadcrumb {
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+
+  .pd-current-price {
+    font-size: 24px;
+  }
+
+  .pd-description-box p {
+    font-size: 13px;
+  }
+
+  .pd-feature-item {
+    font-size: 12px;
+  }
+
+  .pd-quote-form input,
+  .pd-quote-form textarea {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .quote-submit-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .pd-spec-card strong {
+    font-size: 11px;
+  }
+
+  .pd-spec-card p {
+    font-size: 12px;
+  }
+}
+
+/* Tablet improvements */
+@media (min-width: 481px) and (max-width: 1024px) {
+  .pd-main-layout {
+    grid-template-columns: 1fr 1.2fr;
+    gap: 20px;
+  }
+
+  .pd-right-col {
+    grid-column: span 2;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .pd-specs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pd-benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pd-related-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Touch improvements */
+@media (max-width: 768px) {
+  .pd-back,
+  .pd-btn-wa,
+  .pd-btn-call,
+  .quote-submit-btn,
+  .pd-download-btn,
+  .pd-related-card,
+  .pd-spec-card,
+  .pd-benefit-card {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pd-back:active,
+  .pd-btn-wa:active,
+  .pd-btn-call:active {
+    transform: translateY(-2px);
+  }
+
+  /* Improve tap targets */
+  .pd-thumb {
+    min-width: 60px;
+    min-height: 60px;
+  }
+
+  .pd-share-icons a {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Better form interaction */
+  .pd-quote-form input,
+  .pd-quote-form textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Loading states */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0f766e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 40px auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation for image gallery */
+.pd-main-image img {
+  transition: transform 0.3s ease;
+}
+
+.pd-main-image:hover img {
+  transform: scale(1.02);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+/* Add this utility class file to all pages */
+
+/* Responsive Utility Classes */
+.hide-on-mobile {
+  display: block;
+}
+
+.hide-on-tablet {
+  display: block;
+}
+
+.show-on-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none;
+  }
+  
+  .show-on-mobile {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hide-on-tablet {
+    display: none;
+  }
+}
+
+/* Responsive spacing utilities */
+.p-0 { padding: 0; }
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-3 { padding: 16px; }
+.p-4 { padding: 24px; }
+.p-5 { padding: 32px; }
+
+.m-0 { margin: 0; }
+.m-1 { margin: 4px; }
+.m-2 { margin: 8px; }
+.m-3 { margin: 16px; }
+.m-4 { margin: 24px; }
+.m-5 { margin: 32px; }
+
+@media (max-width: 768px) {
+  .p-mobile-0 { padding: 0; }
+  .p-mobile-1 { padding: 4px; }
+  .p-mobile-2 { padding: 8px; }
+  .p-mobile-3 { padding: 12px; }
+  
+  .m-mobile-0 { margin: 0; }
+  .m-mobile-1 { margin: 4px; }
+  .m-mobile-2 { margin: 8px; }
+  .m-mobile-3 { margin: 12px; }
+}
+
+/* Responsive text sizes */
+.text-xs { font-size: 12px; }
+.text-sm { font-size: 14px; }
+.text-base { font-size: 16px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 20px; }
+.text-2xl { font-size: 24px; }
+
+@media (max-width: 768px) {
+  .text-xs-mobile { font-size: 10px; }
+  .text-sm-mobile { font-size: 12px; }
+  .text-base-mobile { font-size: 14px; }
+  .text-lg-mobile { font-size: 16px; }
+  .text-xl-mobile { font-size: 18px; }
+}
+
+/* Responsive flex utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.items-center { align-items: center; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-5 { gap: 24px; }
+
+@media (max-width: 768px) {
+  .flex-col-mobile { flex-direction: column; }
+  .flex-wrap-mobile { flex-wrap: wrap; }
+  .gap-mobile-1 { gap: 4px; }
+  .gap-mobile-2 { gap: 8px; }
+  .gap-mobile-3 { gap: 12px; }
+}
+
+/* Safe area insets for modern phones */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
+  
+  .safe-bottom {
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-left {
+    padding-left: max(16px, env(safe-area-inset-left));
+  }
+  
+  .safe-right {
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* Prevent overflow on all elements */
+* {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Responsive images */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive tables */
+@media (max-width: 768px) {
+  .responsive-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .responsive-table table {
+    display: block;
+    overflow-x: auto;
+  }
+}

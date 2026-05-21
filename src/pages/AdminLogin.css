@@ -590,3 +590,146 @@
   transform: translateY(-2px);
 }
 
+
+
+/* Add this utility class file to all pages */
+
+/* Responsive Utility Classes */
+.hide-on-mobile {
+  display: block;
+}
+
+.hide-on-tablet {
+  display: block;
+}
+
+.show-on-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none;
+  }
+  
+  .show-on-mobile {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hide-on-tablet {
+    display: none;
+  }
+}
+
+/* Responsive spacing utilities */
+.p-0 { padding: 0; }
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-3 { padding: 16px; }
+.p-4 { padding: 24px; }
+.p-5 { padding: 32px; }
+
+.m-0 { margin: 0; }
+.m-1 { margin: 4px; }
+.m-2 { margin: 8px; }
+.m-3 { margin: 16px; }
+.m-4 { margin: 24px; }
+.m-5 { margin: 32px; }
+
+@media (max-width: 768px) {
+  .p-mobile-0 { padding: 0; }
+  .p-mobile-1 { padding: 4px; }
+  .p-mobile-2 { padding: 8px; }
+  .p-mobile-3 { padding: 12px; }
+  
+  .m-mobile-0 { margin: 0; }
+  .m-mobile-1 { margin: 4px; }
+  .m-mobile-2 { margin: 8px; }
+  .m-mobile-3 { margin: 12px; }
+}
+
+/* Responsive text sizes */
+.text-xs { font-size: 12px; }
+.text-sm { font-size: 14px; }
+.text-base { font-size: 16px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 20px; }
+.text-2xl { font-size: 24px; }
+
+@media (max-width: 768px) {
+  .text-xs-mobile { font-size: 10px; }
+  .text-sm-mobile { font-size: 12px; }
+  .text-base-mobile { font-size: 14px; }
+  .text-lg-mobile { font-size: 16px; }
+  .text-xl-mobile { font-size: 18px; }
+}
+
+/* Responsive flex utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.items-center { align-items: center; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-5 { gap: 24px; }
+
+@media (max-width: 768px) {
+  .flex-col-mobile { flex-direction: column; }
+  .flex-wrap-mobile { flex-wrap: wrap; }
+  .gap-mobile-1 { gap: 4px; }
+  .gap-mobile-2 { gap: 8px; }
+  .gap-mobile-3 { gap: 12px; }
+}
+
+/* Safe area insets for modern phones */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
+  
+  .safe-bottom {
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-left {
+    padding-left: max(16px, env(safe-area-inset-left));
+  }
+  
+  .safe-right {
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* Prevent overflow on all elements */
+* {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Responsive images */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive tables */
+@media (max-width: 768px) {
+  .responsive-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .responsive-table table {
+    display: block;
+    overflow-x: auto;
+  }
+}

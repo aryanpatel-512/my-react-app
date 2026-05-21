@@ -2477,3 +2477,522 @@ button {
     padding: 15px 28px;
   }
 }
+
+
+
+/* Add at the end of your home page CSS - Enhanced Responsive */
+
+/* Extra Small Devices (320px - 480px) */
+@media (max-width: 480px) {
+  .wrap {
+    padding: 0 16px;
+  }
+
+  .section {
+    padding: 60px 0;
+  }
+
+  .section-header {
+    margin-bottom: 40px;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+
+  .section-desc {
+    font-size: 14px;
+    padding: 0 12px;
+  }
+
+  /* Hero section */
+  .hero {
+    min-height: auto;
+    padding: 100px 0 60px;
+  }
+
+  .hero__inner {
+    padding: 0 0 40px;
+  }
+
+  .hero__title-line {
+    font-size: 36px;
+  }
+
+  .hero__title-line--1 {
+    font-size: 24px;
+  }
+
+  .hero__desc {
+    font-size: 14px;
+    padding: 0 12px;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero__stats {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .hero__stat-value {
+    font-size: 28px;
+  }
+
+  /* Float cards - hide for mobile */
+  .hero__float--tl,
+  .hero__float--br,
+  .hero__exp-badge {
+    display: none;
+  }
+
+  /* Products grid */
+  .products__grid {
+    gap: 20px;
+  }
+
+  .product-card__img-wrap {
+    height: 200px;
+  }
+
+  .product-card__body {
+    padding: 16px;
+  }
+
+  .product-card__title {
+    font-size: 18px;
+  }
+
+  .product-card__desc {
+    font-size: 13px;
+    min-height: auto;
+  }
+
+  /* Why Us grid */
+  .why__grid {
+    gap: 16px;
+  }
+
+  .feature-card {
+    padding: 24px 20px;
+  }
+
+  .feature-card__title {
+    font-size: 18px;
+  }
+
+  .feature-card__desc {
+    font-size: 13px;
+  }
+
+  /* Testimonials */
+  .testimonial-card {
+    padding: 24px 20px;
+  }
+
+  .testimonial-card__text {
+    font-size: 14px;
+  }
+
+  /* Contact section */
+  .contact__form-wrap {
+    padding: 24px 16px;
+  }
+
+  .contact__form-header h3 {
+    font-size: 24px;
+  }
+
+  .contact__detail {
+    padding: 12px;
+  }
+
+  .contact__detail-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .contact__person-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .contact__person-socials {
+    justify-content: center;
+  }
+
+  /* Form elements */
+  .form__row {
+    gap: 12px;
+  }
+
+  .form__field input,
+  .form__field textarea {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  /* CTA Banner responsive */
+  .cta-banner {
+    padding: 60px 0;
+  }
+
+  .cta-banner__inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 30px;
+  }
+
+  .cta-banner__text h2 {
+    font-size: 28px;
+  }
+
+  .cta-banner__sub {
+    font-size: 14px;
+  }
+
+  .cta-banner__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cta-banner__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Footer */
+  .footer__top {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 40px 20px;
+  }
+
+  .footer__brand-name {
+    font-size: 20px;
+  }
+
+  .footer__col h4 {
+    margin-bottom: 16px;
+  }
+
+  .footer__bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 20px;
+  }
+}
+
+/* 320px specific optimizations */
+@media (max-width: 320px) {
+  .wrap {
+    padding: 0 12px;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+
+  .hero__title-line {
+    font-size: 30px;
+  }
+
+  .hero__title-line--1 {
+    font-size: 20px;
+  }
+
+  .hero__desc {
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
+
+  .product-card__title {
+    font-size: 16px;
+    min-height: auto;
+  }
+
+  .product-card__desc {
+    font-size: 12px;
+  }
+
+  .feature-card {
+    padding: 20px 16px;
+  }
+
+  .feature-card__icon-wrap {
+    width: 48px;
+    height: 48px;
+  }
+
+  .testimonial-card {
+    padding: 20px 16px;
+  }
+
+  .testimonial-card__avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .contact__form-header h3 {
+    font-size: 22px;
+  }
+
+  .contact__success-circle {
+    width: 60px;
+    height: 60px;
+  }
+
+  .contact__success h3 {
+    font-size: 24px;
+  }
+}
+
+/* Landscape mode improvements */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero {
+    min-height: auto;
+    padding: 80px 0 40px;
+  }
+
+  .hero__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .hero__right {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .products__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .why__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+  .nav__link,
+  .mobile-drawer__link,
+  .btn,
+  .product-card,
+  .feature-card,
+  .testimonial-card,
+  .contact__detail,
+  .footer__social {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn:active,
+  .nav__link:active {
+    transform: scale(0.98);
+  }
+
+  /* Better tap targets */
+  .nav__link {
+    padding: 10px 16px;
+  }
+
+  .mobile-drawer__link {
+    padding: 14px 20px;
+  }
+
+  .footer__social {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Smooth scroll behavior */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode styles if needed */
+}
+
+/* Print styles */
+@media print {
+  .header,
+  .mobile-drawer,
+  .hero__actions,
+  .cta-banner,
+  .contact__form-wrap,
+  .footer {
+    display: none;
+  }
+
+  .section {
+    padding: 20px 0;
+  }
+
+  .hero {
+    min-height: auto;
+    padding: 20px 0;
+  }
+}
+
+
+
+/* Add this utility class file to all pages */
+
+/* Responsive Utility Classes */
+.hide-on-mobile {
+  display: block;
+}
+
+.hide-on-tablet {
+  display: block;
+}
+
+.show-on-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none;
+  }
+  
+  .show-on-mobile {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hide-on-tablet {
+    display: none;
+  }
+}
+
+/* Responsive spacing utilities */
+.p-0 { padding: 0; }
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-3 { padding: 16px; }
+.p-4 { padding: 24px; }
+.p-5 { padding: 32px; }
+
+.m-0 { margin: 0; }
+.m-1 { margin: 4px; }
+.m-2 { margin: 8px; }
+.m-3 { margin: 16px; }
+.m-4 { margin: 24px; }
+.m-5 { margin: 32px; }
+
+@media (max-width: 768px) {
+  .p-mobile-0 { padding: 0; }
+  .p-mobile-1 { padding: 4px; }
+  .p-mobile-2 { padding: 8px; }
+  .p-mobile-3 { padding: 12px; }
+  
+  .m-mobile-0 { margin: 0; }
+  .m-mobile-1 { margin: 4px; }
+  .m-mobile-2 { margin: 8px; }
+  .m-mobile-3 { margin: 12px; }
+}
+
+/* Responsive text sizes */
+.text-xs { font-size: 12px; }
+.text-sm { font-size: 14px; }
+.text-base { font-size: 16px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 20px; }
+.text-2xl { font-size: 24px; }
+
+@media (max-width: 768px) {
+  .text-xs-mobile { font-size: 10px; }
+  .text-sm-mobile { font-size: 12px; }
+  .text-base-mobile { font-size: 14px; }
+  .text-lg-mobile { font-size: 16px; }
+  .text-xl-mobile { font-size: 18px; }
+}
+
+/* Responsive flex utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.items-center { align-items: center; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-5 { gap: 24px; }
+
+@media (max-width: 768px) {
+  .flex-col-mobile { flex-direction: column; }
+  .flex-wrap-mobile { flex-wrap: wrap; }
+  .gap-mobile-1 { gap: 4px; }
+  .gap-mobile-2 { gap: 8px; }
+  .gap-mobile-3 { gap: 12px; }
+}
+
+/* Safe area insets for modern phones */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
+  
+  .safe-bottom {
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-left {
+    padding-left: max(16px, env(safe-area-inset-left));
+  }
+  
+  .safe-right {
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* Prevent overflow on all elements */
+* {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Responsive images */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive tables */
+@media (max-width: 768px) {
+  .responsive-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .responsive-table table {
+    display: block;
+    overflow-x: auto;
+  }
+}
