@@ -23,7 +23,7 @@ const getProducts = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(pageSize);
     
-  res.json(data);
+  res.json({ success: true, data, count: data.length, page: pageNumber, totalPages: Math.ceil(data.length / pageSize) });
 });
 
 const createProduct = asyncHandler(async (req, res) => {
@@ -42,7 +42,7 @@ const createProduct = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     message: "Product Added Successfully",
-    product: newProduct,
+    data: newProduct,
   });
 });
 
@@ -66,7 +66,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   res.json({
     success: true,
     message: "Product Updated Successfully",
-    product: updatedProduct,
+    data: updatedProduct,
   });
 });
 

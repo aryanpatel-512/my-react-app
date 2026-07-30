@@ -24,8 +24,9 @@ export default function ProductDetail() {
 
   const fetchProducts = async () => {
     try {
-const response = await fetch(`${window.location.origin}/api/products`);
-      const data = await response.json();
+      const response = await fetch(`${window.location.origin}/api/v1/products`);
+      const json = await response.json();
+      const data = json.data || [];
       setProducts(data);
       const found = data.find((item) => item._id === id);
       setProduct(found);
@@ -53,7 +54,7 @@ try {
   setSending(true);
 
   const res = await fetch(
-    `${window.location.origin}/api/inquiries`,
+    `${window.location.origin}/api/v1/inquiries`,
     {
       method: "POST",
       headers: {

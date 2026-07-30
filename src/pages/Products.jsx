@@ -29,8 +29,9 @@ export default function Products() {
 
   const fetchProducts = async () => {
     try {
-const response = await fetch(`${window.location.origin}/api/products`);
-      const data = await response.json();
+      const response = await fetch(`${window.location.origin}/api/v1/products`);
+      const json = await response.json();
+      const data = json.data || [];
       console.log("Products loaded:", data);
       console.log("First product ID:", data[0]?._id);
       setProducts(data);

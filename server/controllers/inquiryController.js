@@ -4,7 +4,7 @@ const ApiError = require("../utils/ApiError");
 
 const getInquiries = asyncHandler(async (req, res) => {
   const data = await Inquiry.find({ isDeleted: false }).sort({ createdAt: -1 });
-  res.json(data);
+  res.json({ success: true, data, count: data.length });
 });
 
 const createInquiry = asyncHandler(async (req, res) => {
@@ -20,7 +20,7 @@ const createInquiry = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     success: true,
-    inquiry,
+    data: inquiry,
   });
 });
 
@@ -87,7 +87,10 @@ const addNote = asyncHandler(async (req, res) => {
 
   await inquiry.save();
 
-  res.json(inquiry);
+  res.json({
+    success: true,
+    data: inquiry,
+  });
 });
 
 const deleteInquiry = asyncHandler(async (req, res) => {

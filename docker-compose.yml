@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: sri_srinivasa_backend
+    ports:
+      - "10000:10000"
+    environment:
+      - NODE_ENV=development
+      - PORT=10000
+      - MONGO_URI=mongodb://mongo:27017/sri_srinivasa
+      - JWT_SECRET=local_development_secret_only
+      - JWT_REFRESH_SECRET=local_refresh_secret
+    volumes:
+      - ./server/uploads:/usr/src/app/uploads
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:6
+    container_name: sri_srinivasa_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongo_data:

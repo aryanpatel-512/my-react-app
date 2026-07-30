@@ -4,13 +4,12 @@ const ApiError = require("../utils/ApiError");
 
 const getCategories = asyncHandler(async (req, res) => {
   const data = await Category.find({ isDeleted: false }).sort({ createdAt: -1 });
-  res.json(data);
+  res.json({ success: true, data, count: data.length });
 });
 
 const createCategory = asyncHandler(async (req, res) => {
   const name = req.body.name.trim();
   
-  // Case-insensitive duplicate check
   const exists = await Category.findOne({ 
     name: { $regex: new RegExp(`^${name}$`, 'i') },
     isDeleted: false 
@@ -24,7 +23,7 @@ const createCategory = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     success: true,
-    category,
+    data: category,
   });
 });
 
@@ -53,7 +52,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    category: updated,
+    data: updated,
   });
 });
 

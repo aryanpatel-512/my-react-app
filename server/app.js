@@ -32,10 +32,10 @@ const uploadsPath = path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadsPath));
 
 // API Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/inquiries", inquiryRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/inquiries", inquiryRoutes);
 
 // Serve frontend dist
 const distPath = path.join(__dirname, "../dist");

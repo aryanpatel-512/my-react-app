@@ -169,7 +169,7 @@ const handleFormSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const res = await fetch(`${API}/api/inquiries`, {
+    const res = await fetch(`${API}/api/v1/inquiries`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

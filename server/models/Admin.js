@@ -28,6 +28,9 @@ const adminSchema = new mongoose.Schema(
     lastLoginAt: {
       type: Date,
     },
+    refreshToken: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

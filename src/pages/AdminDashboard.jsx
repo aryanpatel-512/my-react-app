@@ -96,7 +96,10 @@ export default function AdminDashboard() {
     const headers = { ...options.headers };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     
-    const res = await fetch(url, { ...options, headers });
+    // Auto-inject /v1/ if not present
+    const v1Url = url.includes('/api/v1/') ? url : url.replace('/api/', '/api/v1/');
+    
+    const res = await fetch(v1Url, { ...options, headers });
     
     if (res.status === 401) {
       localStorage.removeItem('adminToken');
@@ -112,7 +115,8 @@ export default function AdminDashboard() {
   };
 
   const safeJson = async (res) => {
-    return res.json();
+    const json = await res.json();
+    return json.success && json.data ? json.data : json;
   };
 
   const fetchProducts = useCallback(async () => {
@@ -126,7 +130,7 @@ export default function AdminDashboard() {
   const fetchCategories = async () => {
     try {
       const res = await authFetch(`${API}/api/categories`);
-      const data = await res.json();
+      const data = await safeJson(res);
       setCategories(Array.isArray(data) ? data : data.categories ?? []);
     } catch (err) { console.error("fetchCategories:", err); }
   };
