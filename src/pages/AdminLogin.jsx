@@ -17,7 +17,7 @@ export default function AdminLogin() {
 
   try {
     const res = await fetch(
-      `${window.location.origin}/api/admin/login`,
+      `${window.location.origin}/api/auth/login`,
       {
         method: "POST",
         headers: {

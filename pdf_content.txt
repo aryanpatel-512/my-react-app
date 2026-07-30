@@ -1,0 +1,602 @@
+Page 1
+Production Readiness Improvement &
+Implementation Requirements
+Sri Srinivasa Clean Rooms & Medical Furniture Web Application
+Technical Evaluation and Development Action Plan
+Document Purpose
+This document defines the technical improvements required before the current application can be considered
+production-ready.
+The existing application provides a functional base for product management, category management, customer
+inquiries, and administrative operations. However, the current implementation requires improvements in security,
+backend architecture, database design, validation, exception handling, file management, testing, configuration, and
+deployment practices.
+The development team must implement the requirements listed in this document according to the assigned priority.
+1. CURRENT TECHNICAL OVERVIEW
+The application currently uses the following architecture:
+Frontend
+•
+React
+•
+Vite
+•
+React Router
+•
+JavaScript
+•
+CSS
+Backend
+•
+Node.js
+•
+Express.js
+•
+MongoDB
+•
+Mongoose
+Authentication
+•
+Admin username and password validation
+•
+JWT token generation
+File Handling
+•
+Multer
+•
+Local server upload directory
+Main Application Modules
+
+Page 2
+•
+Public website
+•
+Product listing
+•
+Product details
+•
+Customer inquiry submission
+•
+Admin login
+•
+Admin dashboard
+•
+Product management
+•
+Category management
+•
+Inquiry management
+•
+Inquiry status and priority management
+•
+Inquiry notes
+The application functionality is available, but the current backend architecture and security implementation require
+restructuring before production deployment.
+2. CRITICAL PRIORITY – BACKEND AUTHENTICATION AND
+AUTHORIZATION
+Current Observation
+The application currently generates a JWT token after successful admin login.
+The token is stored in browser localStorage as:
+adminToken
+The frontend admin dashboard checks whether this token exists and redirects the user to the login page when the
+token is missing.
+However, the backend administrative APIs currently do not verify the JWT token.
+For example, operations related to:
+•
+Adding products
+•
+Updating products
+•
+Deleting products
+•
+Viewing inquiries
+•
+Deleting inquiries
+•
+Updating inquiry status
+•
+Updating inquiry priority
+•
+Adding inquiry notes
+•
+Adding categories
+•
+Updating categories
+•
+Deleting categories
+can currently be accessed without JWT authorization at the API level.
+
+Page 3
+Checking the token only on the frontend is not a security mechanism.
+A user can directly call the backend API without accessing the admin dashboard.
+Required Implementation
+Create a JWT authentication middleware.
+Recommended file:
+server/middleware/authMiddleware.js
+The middleware must:
+1
+Read the Authorization header.
+2
+Verify the header uses the Bearer token format.
+3
+Extract the JWT token.
+4
+Verify the token using JWT_SECRET.
+5
+Reject missing tokens.
+6
+Reject invalid tokens.
+7
+Reject expired tokens.
+8
+Attach authenticated admin information to the request.
+9
+Call the next middleware only after successful verification.
+Expected request format:
+Authorization: Bearer <JWT_TOKEN>
+Protected administrative routes must use the authentication middleware.
+Example conceptual structure:
+router.post("/", verifyAdminToken, createProduct)
+The following operations must be protected:
+•
+POST product
+•
+PUT product
+•
+DELETE product
+•
+GET admin inquiries
+•
+PUT inquiry status
+•
+PUT inquiry priority
+•
+POST inquiry notes
+•
+DELETE inquiry
+•
+POST category
+•
+PUT category
+•
+DELETE category
+Public routes should remain publicly accessible only where required.
+Examples:
+
+Page 4
+•
+GET products
+•
+GET product details
+•
+GET categories, if required by the public website
+•
+POST customer inquiry
+Frontend Requirement
+All admin API requests must send the JWT token.
+The admin dashboard must include:
+Authorization: Bearer ${token}
+for every protected API request.
+Acceptance Criteria
+•
+A protected API called without a token returns HTTP 401.
+•
+An invalid JWT returns HTTP 401.
+•
+An expired JWT returns HTTP 401.
+•
+A valid admin JWT allows the request.
+•
+Admin dashboard requests automatically include the token.
+•
+Expired sessions redirect the administrator to the login page.
+Priority: CRITICAL
+3. CRITICAL PRIORITY – ADMIN CREDENTIAL MANAGEMENT
+Current Observation
+Admin authentication currently compares the provided username and password directly with environment
+variables.
+The implementation follows the equivalent logic of:
+username === ADMIN_USER
+password === ADMIN_PASS
+This means the authentication design depends on a plain credential comparison.
+The backend dependencies include bcryptjs, but password hashing is not currently integrated into the login
+process.
+Required Implementation
+Admin users should be stored in the database.
+Create an Admin model.
+Recommended file:
+server/models/Admin.js
+Recommended fields:
+•
+username
+•
+email
+
+Page 5
+•
+passwordHash
+•
+role
+•
+isActive
+•
+lastLoginAt
+•
+createdAt
+•
+updatedAt
+The password must never be stored as plain text.
+Use bcrypt for password hashing.
+Recommended minimum bcrypt salt rounds:
+10 or 12
+During login:
+1
+Find the admin by username or email.
+2
+Verify that the account exists.
+3
+Verify that the account is active.
+4
+Compare the submitted password using bcrypt.compare().
+5
+Generate the JWT only after successful authentication.
+6
+Update lastLoginAt.
+7
+Return a generic invalid credential message for failed authentication.
+Do not reveal whether the username or password was incorrect.
+Acceptance Criteria
+•
+Plain-text admin passwords are not stored.
+•
+bcrypt is used for password hashing.
+•
+bcrypt comparison is used during login.
+•
+Admin information is loaded from MongoDB.
+•
+Inactive admins cannot log in.
+•
+Login failures use generic messages.
+Priority: CRITICAL
+4. CRITICAL PRIORITY – REMOVE SENSITIVE CONFIGURATION
+FROM GIT HISTORY
+Current Observation
+The project Git history indicates that server/.env was previously tracked in the repository.
+The environment file contained configuration keys for:
+•
+MongoDB connection
+•
+Admin username
+
+Page 6
+•
+Admin password
+•
+JWT secret
+Even if the file is currently deleted or ignored, secrets that were previously committed to Git must be considered
+compromised.
+Required Implementation
+The development team must:
+1
+Ensure .env is ignored by Git.
+2
+Add an explicit .env rule to .gitignore.
+3
+Create .env.example.
+4
+Remove sensitive configuration from repository history where required.
+5
+Rotate the MongoDB credentials.
+6
+Rotate the JWT secret.
+7
+Change existing administrative credentials.
+8
+Review deployment environment variables.
+Recommended .env.example variables:
+MONGO_URL=
+PORT=
+JWT_SECRET=
+JWT_EXPIRES_IN=
+CLIENT_URL=
+No real credentials should exist in .env.example.
+Acceptance Criteria
+•
+.env is not tracked by Git.
+•
+No active secret is stored in source code.
+•
+Previously exposed secrets are rotated.
+•
+.env.example is available.
+•
+Production secrets are configured through the deployment platform.
+Priority: CRITICAL
+5. HIGH PRIORITY – BACKEND ARCHITECTURE RESTRUCTURING
+Current Observation
+A significant amount of application logic currently exists directly inside server.js.
+The same file currently manages:
+•
+Express configuration
+•
+Middleware
+•
+Static file configuration
+•
+Multer configuration
+
+Page 7
+•
+MongoDB connection
+•
+Database initialization
+•
+Product APIs
+•
+Inquiry APIs
+•
+Category APIs
+•
+Maintenance operations
+•
+Frontend serving
+•
+Server startup
+This structure will become difficult to maintain as the application grows.
+Required Architecture
+The backend must be reorganized into separate layers.
+Recommended structure:
+server/
+config/
+- db.js
+- env.js
+controllers/
+- authController.js
+- productController.js
+- categoryController.js
+- inquiryController.js
+middleware/
+- authMiddleware.js
+- errorMiddleware.js
+- validationMiddleware.js
+- uploadMiddleware.js
+- rateLimitMiddleware.js
+models/
+- Admin.js
+- Product.js
+- Category.js
+- Inquiry.js
+routes/
+- authRoutes.js
+- productRoutes.js
+- categoryRoutes.js
+- inquiryRoutes.js
+services/
+- authService.js
+- productService.js
+- inquiryService.js
+validators/
+- authValidator.js
+- productValidator.js
+
+Page 8
+- categoryValidator.js
+- inquiryValidator.js
+utils/
+- ApiError.js
+- asyncHandler.js
+- logger.js
+app.js
+server.js
+Responsibility Separation
+Routes
+Routes must only define endpoints and middleware.
+Controllers
+Controllers must manage HTTP requests and responses.
+Services
+Services must contain business logic.
+Models
+Models must define database schemas.
+Validators
+Validators must validate incoming request data.
+Middleware
+Middleware must handle cross-cutting concerns such as authentication and error handling.
+Acceptance Criteria
+•
+API logic is removed from server.js.
+•
+Controllers are implemented.
+•
+Routes are separated by module.
+•
+Authentication middleware is reusable.
+•
+Validation logic is separated.
+•
+Error handling is centralized.
+•
+Database configuration is separated.
+Priority: HIGH
+6. HIGH PRIORITY – INPUT VALIDATION
+Current Observation
+Most backend APIs directly use req.body values without proper validation.
+Examples include:
+
+Page 9
+•
+Product title
+•
+Product price
+•
+Product category
+•
+Product description
+•
+Inquiry name
+•
+Inquiry phone
+•
+Inquiry email
+•
+Inquiry message
+•
+Inquiry status
+•
+Inquiry priority
+•
+Inquiry notes
+•
+Category name
+The frontend required attribute is not sufficient because API requests can be sent directly to the backend.
+Required Implementation
+Implement backend request validation.
+A validation library such as Joi, Zod, or express-validator may be used.
+Product Validation
+•
+title – Required, string, trim whitespace, minimum length, maximum length.
+•
+price – Use an appropriate numeric representation if the value is an actual monetary amount; reject invalid
+text and negative values.
+•
+category – Required and must reference or match a valid category.
+•
+description – Required with a maximum allowed length.
+Inquiry Validation
+•
+name – Required, trimmed, and length restricted.
+•
+phone – Required if required by business rules; valid phone format and length restrictions.
+•
+email – Valid email format; normalize email and convert to lowercase where appropriate.
+•
+message – Required with minimum and maximum length.
+•
+type – Must use an allowed value.
+Inquiry Status Validation
+The status field must use an enum. Recommended values:
+•
+new
+•
+contacted
+•
+in_progress
+•
+closed
+The backend must reject any unsupported status.
+
+Page 10
+Inquiry Priority Validation
+Recommended values:
+•
+low
+•
+normal
+•
+high
+•
+urgent
+The backend must reject unsupported priority values.
+Category Validation
+•
+Category name is required.
+•
+Trim whitespace.
+•
+Reject empty category names.
+•
+Apply maximum length.
+•
+Prevent duplicate names using case-insensitive rules.
+Notes Validation
+•
+Note cannot be empty.
+•
+Trim whitespace.
+•
+Apply maximum length.
+Acceptance Criteria
+•
+Invalid requests return HTTP 400.
+•
+Validation errors have a consistent response format.
+•
+Unsupported enum values are rejected.
+•
+Empty strings are rejected.
+•
+Data is normalized before database insertion.
+Priority: HIGH
+7. HIGH PRIORITY – GLOBAL EXCEPTION HANDLING
+Current Observation
+Almost every route currently contains its own try/catch block and returns the raw error message.
+The repeated pattern creates duplicated code.
+Returning error.message directly to clients may expose implementation or database information.
+Required Implementation
+Create a centralized error handling system.
+Recommended files:
+middleware/errorMiddleware.js
+utils/ApiError.js
+utils/asyncHandler.js
+
+Page 11
+The application should define a consistent error response.
+{
+  "success": false,
+  "error": {
+    "code": "PRODUCT_NOT_FOUND",
+    "message": "Product not found"
+  }
+}
+In production, stack traces and internal database errors must not be returned to the client.
+Handle common errors including:
+•
+Invalid MongoDB ObjectId
+•
+Resource not found
+•
+Duplicate category
+•
+Validation failure
+•
+Unauthorized request
+•
+Forbidden request
+•
+Invalid JWT
+•
+Expired JWT
+•
+File upload failure
+•
+Database connection failure
+•
+Unexpected internal error
+HTTP Status Requirements
+•
+200 – Successful request
+•
+201 – Resource created
+•
+400 – Invalid request
+•
+401 – Authentication required
+•
+403 – Insufficient permission
+•
+404 – Resource not found
+•
+409 – Resource conflict
+•
+413 – File too large
+•
+415 – Unsupported media type
+•
+429 – Too many requests
+•
+500 – Internal server error
+Acceptance Criteria
+•
+Duplicate route-level error handling is reduced.
+•
+Errors follow one response structure.
+•
+Internal stack traces are hidden.

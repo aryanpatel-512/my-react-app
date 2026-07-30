@@ -2,11 +2,29 @@ const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
 {
-  title: String,
-  category: String,
-  price: String,
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 200
+  },
+  category: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  price: {
+    type: String,
+    required: true,
+    trim: true
+  },
   image: String,
-  desc: String
+  desc: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 2000
+  }
 },
 { timestamps: true }
 );

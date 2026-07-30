@@ -91,22 +91,33 @@ export default function AdminDashboard() {
     { value: "hospital", label: "Hospital", color: "#10b981", bg: "#d1fae5" }
   ];
 
+  const authFetch = async (url, options = {}) => {
+    const token = localStorage.getItem('adminToken');
+    const headers = { ...options.headers };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    
+    const res = await fetch(url, { ...options, headers });
+    
+    if (res.status === 401) {
+      localStorage.removeItem('adminToken');
+      window.location.href = '/admin/login';
+      throw new Error('Unauthorized');
+    }
+    return res;
+  };
+
   const showToast = (message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
   };
 
   const safeJson = async (res) => {
-    const ct = res.headers.get("content-type") || "";
-    if (ct.includes("application/json")) return res.json();
-    const text = await res.text();
-    console.error("Non-JSON server response:", text);
-    throw new Error(`Server ${res.status}: ${text.slice(0, 300)}`);
+    return res.json();
   };
 
   const fetchProducts = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/api/products`);
+      const res = await authFetch(`${API}/api/products`);
       const data = await safeJson(res);
       setProducts(Array.isArray(data) ? data : data.products ?? []);
     } catch (err) { console.error("fetchProducts:", err); }
@@ -114,7 +125,7 @@ export default function AdminDashboard() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch(`${API}/api/categories`);
+      const res = await authFetch(`${API}/api/categories`);
       const data = await res.json();
       setCategories(Array.isArray(data) ? data : data.categories ?? []);
     } catch (err) { console.error("fetchCategories:", err); }
@@ -122,7 +133,7 @@ export default function AdminDashboard() {
 
   const fetchInquiries = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/api/inquiries`);
+      const res = await authFetch(`${API}/api/inquiries`);
       const data = await safeJson(res);
       setInquiries(Array.isArray(data) ? data : data.inquiries ?? []);
     } catch (err) { console.warn("fetchInquiries:", err.message); }
@@ -240,7 +251,7 @@ Sri Srinivasa Clean Rooms`;
     }
 
     try {
-      const res = await fetch(`${API}/api/categories`, {
+      const res = await authFetch(`${API}/api/categories`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newCategory.trim() })
@@ -261,7 +272,7 @@ Sri Srinivasa Clean Rooms`;
   const deleteCategory = async (id) => {
     if (!window.confirm("Delete this category? Products in this category will be affected.")) return;
     try {
-      const res = await fetch(`${API}/api/categories/${id}`, { method: "DELETE" });
+      const res = await authFetch(`${API}/api/categories/${id}`, { method: "DELETE" });
       if (res.ok) {
         await fetchCategories();
         await fetchProducts();
@@ -320,7 +331,7 @@ Sri Srinivasa Clean Rooms`;
 
   const updateInquiryStatus = async (id, status) => {
     try {
-      const res = await fetch(`${API}/api/inquiries/${id}/status`, {
+      const res = await authFetch(`${API}/api/inquiries/${id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
@@ -334,7 +345,7 @@ Sri Srinivasa Clean Rooms`;
 
   const updateInquiryPriority = async (id, priority) => {
     try {
-      const res = await fetch(`${API}/api/inquiries/${id}/priority`, {
+      const res = await authFetch(`${API}/api/inquiries/${id}/priority`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ priority })
@@ -349,7 +360,7 @@ Sri Srinivasa Clean Rooms`;
   const addNote = async () => {
     if (!noteText.trim()) return;
     try {
-      const res = await fetch(`${API}/api/inquiries/${selectedInquiry._id}/notes`, {
+      const res = await authFetch(`${API}/api/inquiries/${selectedInquiry._id}/notes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ note: noteText, createdAt: new Date().toISOString() })
@@ -382,7 +393,7 @@ Sri Srinivasa Clean Rooms`;
     fd.append("image", form.image.files[0]);
 
     try {
-      const res = await fetch(`${API}/api/products`, { method: "POST", body: fd });
+      const res = await authFetch(`${API}/api/products`, { method: "POST", body: fd });
       const data = await safeJson(res);
 
       if (res.ok || data.success) {
@@ -417,7 +428,7 @@ Sri Srinivasa Clean Rooms`;
     }
 
     try {
-      const res = await fetch(`${API}/api/products/${editingProduct._id}`, { method: "PUT", body: fd });
+      const res = await authFetch(`${API}/api/products/${editingProduct._id}`, { method: "PUT", body: fd });
       const data = await safeJson(res);
 
       if (res.ok || data.success) {
@@ -439,7 +450,7 @@ Sri Srinivasa Clean Rooms`;
     if (!window.confirm("Delete this product?")) return;
     setProducts(prev => prev.filter(p => p._id !== id));
     try {
-      const res = await fetch(`${API}/api/products/${id}`, { method: "DELETE" });
+      const res = await authFetch(`${API}/api/products/${id}`, { method: "DELETE" });
       if (res.ok) showToast("Product deleted");
       else { showToast("Failed to delete", "error"); fetchProducts(); }
     } catch { showToast("Server error", "error"); fetchProducts(); }
@@ -447,7 +458,7 @@ Sri Srinivasa Clean Rooms`;
 
   const markAsRead = async (id) => {
     setInquiries(prev => prev.map(i => i._id === id ? { ...i, read: true } : i));
-    try { await fetch(`${API}/api/inquiries/${id}/read`, { method: "PUT" }); } 
+    try { await authFetch(`${API}/api/inquiries/${id}/read`, { method: "PUT" }); } 
     catch (err) { console.error(err); }
   };
 
@@ -455,7 +466,7 @@ Sri Srinivasa Clean Rooms`;
     if (!window.confirm("Delete this inquiry?")) return;
     setInquiries(prev => prev.filter(i => i._id !== id));
     try {
-      await fetch(`${API}/api/inquiries/${id}`, { method: "DELETE" });
+      await authFetch(`${API}/api/inquiries/${id}`, { method: "DELETE" });
       showToast("Inquiry deleted");
     } catch { showToast("Server error", "error"); }
   };
