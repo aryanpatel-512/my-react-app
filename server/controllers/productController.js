@@ -4,7 +4,7 @@ const ApiError = require("../utils/ApiError");
 
 const getProducts = asyncHandler(async (req, res) => {
   const { search, category, page, limit } = req.query;
-  const filter = { isDeleted: false };
+  const filter = { isDeleted: { $ne: true } };
   
   if (category && category !== "All") {
     filter.category = category;

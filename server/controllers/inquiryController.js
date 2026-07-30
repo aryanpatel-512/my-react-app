@@ -3,7 +3,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 
 const getInquiries = asyncHandler(async (req, res) => {
-  const data = await Inquiry.find({ isDeleted: false }).sort({ createdAt: -1 });
+  const data = await Inquiry.find({ isDeleted: { $ne: true } }).sort({ createdAt: -1 });
   res.json({ success: true, data, count: data.length });
 });
 
