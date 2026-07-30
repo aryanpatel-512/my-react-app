@@ -92,7 +92,7 @@ try {
 
   } else {
     alert(
-      "❌ Failed to send inquiry. Please try again."
+      `❌ ${data.error || data.message || "Failed to send inquiry. Please try again."}`
     );
   }
 

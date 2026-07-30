@@ -193,6 +193,8 @@ const handleFormSubmit = async (e) => {
         email: "",
         message: ""
       });
+    } else {
+      alert(`❌ ${data.error || data.message || "Failed to send inquiry. Please try again."}`);
     }
 
   } catch (err) {
