@@ -214,7 +214,7 @@ try {
               <img
   src={
     product.image?.replace(
-      "https://my-react-app-production-b77b.up.railway.app",
+      "http://localhost:10000",
       window.location.origin
     )
   }/>
@@ -230,21 +230,21 @@ try {
                 <div className="pd-thumb active"><img
   src={
     product.image?.replace(
-      "https://my-react-app-production-b77b.up.railway.app",
+      "http://localhost:10000",
       window.location.origin
     )
   } /></div>
                 <div className="pd-thumb"><img
   src={
     product.image?.replace(
-      "https://my-react-app-production-b77b.up.railway.app",
+      "http://localhost:10000",
       window.location.origin
     )
   }/></div>
                 <div className="pd-thumb"><img
   src={
     product.image?.replace(
-      "https://my-react-app-production-b77b.up.railway.app",
+      "http://localhost:10000",
       window.location.origin
     )
   }/></div>
@@ -418,7 +418,7 @@ try {
                   <div className="related-image"><img
   src={
     item.image?.replace(
-      "https://my-react-app-production-b77b.up.railway.app",
+      "http://localhost:10000",
       window.location.origin
     )
   }

@@ -390,7 +390,7 @@ const response = await fetch(`${window.location.origin}/api/products`);
                   <img
   src={
     item.image?.replace(
-      "https://my-react-app-production-b77b.up.railway.app",
+      "http://localhost:10000",
       window.location.origin
     )
   }

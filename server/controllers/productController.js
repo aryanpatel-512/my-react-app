@@ -9,7 +9,7 @@ const getProducts = asyncHandler(async (req, res) => {
 
 const createProduct = asyncHandler(async (req, res) => {
   const imageUrl = req.file
-    ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+    ? `/uploads/${req.file.filename}`
     : "";
 
   const newProduct = await Product.create({
@@ -31,7 +31,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   const updateData = { ...req.body };
 
   if (req.file) {
-    updateData.image = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    updateData.image = `/uploads/${req.file.filename}`;
   }
 
   const updatedProduct = await Product.findByIdAndUpdate(
