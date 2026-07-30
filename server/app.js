@@ -1,7 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const helmet = require("helmet");
+const logger = require("./utils/logger");
 const errorMiddleware = require("./middleware/errorMiddleware");
+const { swaggerUi, specs } = require("./swagger");
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
@@ -11,8 +14,18 @@ const inquiryRoutes = require("./routes/inquiryRoutes");
 
 const app = express();
 
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(express.json());
+
+// Request logging middleware
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.url}`);
+  next();
+});
+
+// Swagger docs
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Serve static uploads
 const uploadsPath = path.join(__dirname, "uploads");

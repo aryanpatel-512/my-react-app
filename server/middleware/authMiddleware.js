@@ -30,4 +30,13 @@ const verifyAdminToken = async (req, res, next) => {
   }
 };
 
-module.exports = { verifyAdminToken };
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!req.admin || !roles.includes(req.admin.role)) {
+      return next(ApiError.forbidden("You do not have permission to perform this action"));
+    }
+    next();
+  };
+};
+
+module.exports = { verifyAdminToken, authorizeRoles };

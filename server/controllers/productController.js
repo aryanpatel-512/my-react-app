@@ -3,7 +3,26 @@ const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 
 const getProducts = asyncHandler(async (req, res) => {
-  const data = await Product.find().sort({ createdAt: -1 });
+  const { search, category, page, limit } = req.query;
+  const filter = { isDeleted: false };
+  
+  if (category && category !== "All") {
+    filter.category = category;
+  }
+  
+  if (search) {
+    filter.$text = { $search: search };
+  }
+  
+  const pageNumber = parseInt(page, 10) || 1;
+  const pageSize = parseInt(limit, 10) || 1000;
+  const skip = (pageNumber - 1) * pageSize;
+  
+  const data = await Product.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(pageSize);
+    
   res.json(data);
 });
 
@@ -40,7 +59,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     { new: true, runValidators: true }
   );
 
-  if (!updatedProduct) {
+  if (!updatedProduct || updatedProduct.isDeleted) {
     throw ApiError.notFound("Product not found");
   }
 
@@ -52,7 +71,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
-  const product = await Product.findByIdAndDelete(req.params.id);
+  const product = await Product.findByIdAndUpdate(req.params.id, { isDeleted: true }, { new: true });
   if (!product) {
     throw ApiError.notFound("Product not found");
   }

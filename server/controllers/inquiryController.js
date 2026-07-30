@@ -3,7 +3,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 
 const getInquiries = asyncHandler(async (req, res) => {
-  const data = await Inquiry.find().sort({ createdAt: -1 });
+  const data = await Inquiry.find({ isDeleted: false }).sort({ createdAt: -1 });
   res.json(data);
 });
 
@@ -25,7 +25,11 @@ const createInquiry = asyncHandler(async (req, res) => {
 });
 
 const markAsRead = asyncHandler(async (req, res) => {
-  const updated = await Inquiry.findByIdAndUpdate(req.params.id, { read: true });
+  const updated = await Inquiry.findOneAndUpdate(
+    { _id: req.params.id, isDeleted: false }, 
+    { read: true },
+    { new: true }
+  );
   if (!updated) {
     throw ApiError.notFound("Inquiry not found");
   }
@@ -37,10 +41,10 @@ const markAsRead = asyncHandler(async (req, res) => {
 });
 
 const updateStatus = asyncHandler(async (req, res) => {
-  const updated = await Inquiry.findByIdAndUpdate(
-    req.params.id, 
+  const updated = await Inquiry.findOneAndUpdate(
+    { _id: req.params.id, isDeleted: false }, 
     { status: req.body.status },
-    { runValidators: true }
+    { runValidators: true, new: true }
   );
   
   if (!updated) {
@@ -54,10 +58,10 @@ const updateStatus = asyncHandler(async (req, res) => {
 });
 
 const updatePriority = asyncHandler(async (req, res) => {
-  const updated = await Inquiry.findByIdAndUpdate(
-    req.params.id, 
+  const updated = await Inquiry.findOneAndUpdate(
+    { _id: req.params.id, isDeleted: false }, 
     { priority: req.body.priority },
-    { runValidators: true }
+    { runValidators: true, new: true }
   );
   
   if (!updated) {
@@ -71,7 +75,7 @@ const updatePriority = asyncHandler(async (req, res) => {
 });
 
 const addNote = asyncHandler(async (req, res) => {
-  const inquiry = await Inquiry.findById(req.params.id);
+  const inquiry = await Inquiry.findOne({ _id: req.params.id, isDeleted: false });
   if (!inquiry) {
     throw ApiError.notFound("Inquiry not found");
   }
@@ -87,7 +91,7 @@ const addNote = asyncHandler(async (req, res) => {
 });
 
 const deleteInquiry = asyncHandler(async (req, res) => {
-  const inquiry = await Inquiry.findByIdAndDelete(req.params.id);
+  const inquiry = await Inquiry.findByIdAndUpdate(req.params.id, { isDeleted: true }, { new: true });
   if (!inquiry) {
     throw ApiError.notFound("Inquiry not found");
   }

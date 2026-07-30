@@ -52,7 +52,15 @@ const inquirySchema = new mongoose.Schema({
   read: {
     type: Boolean,
     default: false
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
   }
 }, { timestamps: true });
+
+inquirySchema.index({ status: 1 });
+inquirySchema.index({ isDeleted: 1 });
+inquirySchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("Inquiry", inquirySchema);

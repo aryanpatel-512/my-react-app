@@ -3,7 +3,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 
 const getCategories = asyncHandler(async (req, res) => {
-  const data = await Category.find().sort({ createdAt: -1 });
+  const data = await Category.find({ isDeleted: false }).sort({ createdAt: -1 });
   res.json(data);
 });
 
@@ -11,7 +11,10 @@ const createCategory = asyncHandler(async (req, res) => {
   const name = req.body.name.trim();
   
   // Case-insensitive duplicate check
-  const exists = await Category.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+  const exists = await Category.findOne({ 
+    name: { $regex: new RegExp(`^${name}$`, 'i') },
+    isDeleted: false 
+  });
   
   if (exists) {
     throw ApiError.conflict("Category already exists");
@@ -30,7 +33,8 @@ const updateCategory = asyncHandler(async (req, res) => {
 
   const exists = await Category.findOne({ 
     name: { $regex: new RegExp(`^${name}$`, 'i') },
-    _id: { $ne: req.params.id }
+    _id: { $ne: req.params.id },
+    isDeleted: false
   });
   
   if (exists) {
@@ -43,7 +47,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     { new: true, runValidators: true }
   );
 
-  if (!updated) {
+  if (!updated || updated.isDeleted) {
     throw ApiError.notFound("Category not found");
   }
 
@@ -54,7 +58,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 });
 
 const deleteCategory = asyncHandler(async (req, res) => {
-  const category = await Category.findByIdAndDelete(req.params.id);
+  const category = await Category.findByIdAndUpdate(req.params.id, { isDeleted: true }, { new: true });
   if (!category) {
     throw ApiError.notFound("Category not found");
   }

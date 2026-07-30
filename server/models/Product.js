@@ -24,9 +24,18 @@ const productSchema = new mongoose.Schema(
     required: true,
     trim: true,
     maxlength: 2000
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
   }
 },
 { timestamps: true }
 );
+
+// Indexes for search and filtering performance
+productSchema.index({ title: "text", desc: "text" });
+productSchema.index({ category: 1 });
+productSchema.index({ isDeleted: 1 });
 
 module.exports = mongoose.model("Product", productSchema);
