@@ -33,7 +33,7 @@ export default function AdminLogin() {
     const data = await res.json();
 
     if (data.success) {
-      localStorage.setItem("adminToken", data.token);
+      localStorage.setItem("adminToken", data.data ? data.data.token : data.token);
 
       navigate("/admin/dashboard");
     } else {
