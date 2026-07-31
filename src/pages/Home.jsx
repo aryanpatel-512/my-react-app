@@ -129,6 +129,7 @@ export default function App() {
   const [activeProduct, setActiveProduct] = useState(null);
   const [visibleSections, setVisibleSections] = useState(new Set());
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
+  const [errors, setErrors] = useState({});
   const [formSent, setFormSent] = useState(false);
   const [activeNav, setActiveNav] = useState("Home");
   const sectionRefs = useRef({});
@@ -165,8 +166,27 @@ export default function App() {
 
 const API = window.location.origin;
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name || !formData.name.trim()) newErrors.name = "Name is required";
+    else if (!/^[a-zA-Z\s]+$/.test(formData.name)) newErrors.name = "Only letters and spaces allowed";
+
+    if (!formData.phone || !formData.phone.trim()) newErrors.phone = "Phone is required";
+    else if (!/^[0-9]{10}$/.test(formData.phone)) newErrors.phone = "Phone must be exactly 10 digits";
+
+    if (!formData.email || !formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = "Invalid email format";
+
+    if (!formData.message || !formData.message.trim()) newErrors.message = "Message is required";
+    else if (formData.message.trim().length < 5) newErrors.message = "Message must be at least 5 characters";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
 const handleFormSubmit = async (e) => {
   e.preventDefault();
+  if (!validateForm()) return;
 
   try {
     const res = await fetch(`${API}/api/v1/inquiries`, {
@@ -773,10 +793,12 @@ const handleFormSubmit = async (e) => {
                         id="name"
                         type="text"
                         placeholder="Dr. Ramesh Varma"
-                        required
+                        className={errors.name ? "error-input" : ""}
+                        style={errors.name ? { borderColor: 'red' } : {}}
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       />
+                      {errors.name && <span style={{ color: "red", fontSize: "0.85rem", marginTop: "4px" }}>{errors.name}</span>}
                     </div>
                     <div className="form__field">
                       <label htmlFor="phone">Phone <span>*</span></label>
@@ -784,22 +806,27 @@ const handleFormSubmit = async (e) => {
                         id="phone"
                         type="tel"
                         placeholder="+91 98765 43210"
-                        required
+                        className={errors.phone ? "error-input" : ""}
+                        style={errors.phone ? { borderColor: 'red' } : {}}
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       />
+                      {errors.phone && <span style={{ color: "red", fontSize: "0.85rem", marginTop: "4px" }}>{errors.phone}</span>}
                     </div>
                   </div>
 
                   <div className="form__field">
-                    <label htmlFor="email">Email Address</label>
+                    <label htmlFor="email">Email Address <span>*</span></label>
                     <input
                       id="email"
                       type="email"
                       placeholder="you@hospital.com"
+                      className={errors.email ? "error-input" : ""}
+                      style={errors.email ? { borderColor: 'red' } : {}}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
+                    {errors.email && <span style={{ color: "red", fontSize: "0.85rem", marginTop: "4px" }}>{errors.email}</span>}
                   </div>
 
                   <div className="form__field">
@@ -808,10 +835,12 @@ const handleFormSubmit = async (e) => {
                       id="message"
                       rows={5}
                       placeholder="Tell us about your requirements — product types, quantities, timeline..."
-                      required
+                      className={errors.message ? "error-input" : ""}
+                      style={errors.message ? { borderColor: 'red' } : {}}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     />
+                    {errors.message && <span style={{ color: "red", fontSize: "0.85rem", marginTop: "4px" }}>{errors.message}</span>}
                   </div>
 
                   <button type="submit" className="btn btn--gold btn--lg btn--full">

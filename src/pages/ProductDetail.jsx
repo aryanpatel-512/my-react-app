@@ -17,6 +17,7 @@ export default function ProductDetail() {
     email: "",
     message: ""
   });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchProducts();
@@ -44,9 +45,26 @@ export default function ProductDetail() {
     navigate(path);
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!quoteForm.name || !quoteForm.name.trim()) newErrors.name = "Name is required";
+    else if (!/^[a-zA-Z\s]+$/.test(quoteForm.name)) newErrors.name = "Only letters and spaces allowed";
+
+    if (!quoteForm.phone || !quoteForm.phone.trim()) newErrors.phone = "Phone is required";
+    else if (!/^[0-9]{10}$/.test(quoteForm.phone)) newErrors.phone = "Phone must be exactly 10 digits";
+
+    if (!quoteForm.email || !quoteForm.email.trim()) newErrors.email = "Email is required";
+    else if (!/^\S+@\S+\.\S+$/.test(quoteForm.email)) newErrors.email = "Invalid email format";
+
+    if (!quoteForm.message || !quoteForm.message.trim()) newErrors.message = "Message is required";
+    else if (quoteForm.message.trim().length < 5) newErrors.message = "Message must be at least 5 characters";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const sendInquiry = async () => {
-    if (!quoteForm.name || !quoteForm.phone) {
-      alert("Please enter your Name and Phone number");
+    if (!validateForm()) {
       return;
     }
 
@@ -65,10 +83,7 @@ try {
         name: quoteForm.name,
         phone: quoteForm.phone,
         email: quoteForm.email,
-        message:
-          quoteForm.message ||
-          `Need quote for ${product?.title}`,
-
+        message: quoteForm.message,
         productId: product?._id,
         productName: product?.title,
         type: "product",
@@ -325,15 +340,35 @@ try {
                   <span className="quote-tax">Best Price Guaranteed</span>
                 </div>
                 <div className="pd-quote-form">
-                  <input type="text" placeholder="Full Name *" value={quoteForm.name}
-                    onChange={(e) => setQuoteForm({ ...quoteForm, name: e.target.value })} />
-                  <input type="tel" placeholder="Phone Number *" value={quoteForm.phone}
-                    onChange={(e) => setQuoteForm({ ...quoteForm, phone: e.target.value })} />
-                  <input type="email" placeholder="Email Address" value={quoteForm.email}
-                    onChange={(e) => setQuoteForm({ ...quoteForm, email: e.target.value })} />
-                  <textarea rows="3" placeholder="Your requirements or message..."
-                    value={quoteForm.message}
-                    onChange={(e) => setQuoteForm({ ...quoteForm, message: e.target.value })} />
+                  <div className="input-group">
+                    <input type="text" placeholder="Full Name *" value={quoteForm.name}
+                      className={errors.name ? "error-input" : ""}
+                      onChange={(e) => setQuoteForm({ ...quoteForm, name: e.target.value })} />
+                    {errors.name && <span className="error-text" style={{ color: "red", fontSize: "0.85rem", marginTop: "-10px", display: "block", marginBottom: "10px" }}>{errors.name}</span>}
+                  </div>
+                  
+                  <div className="input-group">
+                    <input type="tel" placeholder="Phone Number *" value={quoteForm.phone}
+                      className={errors.phone ? "error-input" : ""}
+                      onChange={(e) => setQuoteForm({ ...quoteForm, phone: e.target.value })} />
+                    {errors.phone && <span className="error-text" style={{ color: "red", fontSize: "0.85rem", marginTop: "-10px", display: "block", marginBottom: "10px" }}>{errors.phone}</span>}
+                  </div>
+                  
+                  <div className="input-group">
+                    <input type="email" placeholder="Email Address *" value={quoteForm.email}
+                      className={errors.email ? "error-input" : ""}
+                      onChange={(e) => setQuoteForm({ ...quoteForm, email: e.target.value })} />
+                    {errors.email && <span className="error-text" style={{ color: "red", fontSize: "0.85rem", marginTop: "-10px", display: "block", marginBottom: "10px" }}>{errors.email}</span>}
+                  </div>
+                  
+                  <div className="input-group">
+                    <textarea rows="3" placeholder="Your requirements or message... *"
+                      value={quoteForm.message}
+                      className={errors.message ? "error-input" : ""}
+                      onChange={(e) => setQuoteForm({ ...quoteForm, message: e.target.value })} />
+                    {errors.message && <span className="error-text" style={{ color: "red", fontSize: "0.85rem", marginTop: "-10px", display: "block", marginBottom: "10px" }}>{errors.message}</span>}
+                  </div>
+
                   <button className="quote-submit-btn" onClick={sendInquiry} disabled={sending}>
                     {sending ? "Sending..." : "Get Best Quote →"}
                   </button>
