@@ -20,8 +20,12 @@ const createInquiry = asyncHandler(async (req, res) => {
     read: false,
   });
 
-  // Send email notification without awaiting to prevent blocking the response
-  sendInquiryNotification(inquiry);
+  // Send email notification to owner
+  try {
+    await sendInquiryNotification(inquiry);
+  } catch (emailErr) {
+    // Already logged inside emailService, catch here so it doesn't break the API response
+  }
 
   res.status(201).json({
     success: true,

@@ -2,15 +2,16 @@ const nodemailer = require('nodemailer');
 const logger = require('./logger');
 
 const sendInquiryNotification = async (inquiryData) => {
-  try {
-    // If SMTP credentials aren't configured in .env, just log it and return so it doesn't crash
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS || !process.env.RECEIVER_EMAIL) {
-      logger.warn("SMTP credentials not configured. Email notification skipped.");
-      return;
-    }
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS || !process.env.RECEIVER_EMAIL) {
+    logger.warn("SMTP credentials not configured. Email notification skipped.");
+    return;
+  }
 
+  try {
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // Defaulting to gmail, can be overridden by env variables
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -20,10 +21,10 @@ const sendInquiryNotification = async (inquiryData) => {
     const mailOptions = {
       from: `"Sri Srinivasa Clean Rooms" <${process.env.SMTP_USER}>`,
       to: process.env.RECEIVER_EMAIL,
-      subject: `New Lead Alert: ${inquiryData.type === 'product' ? inquiryData.productName : 'General Inquiry'}`,
+      subject: `🔔 New Lead: ${inquiryData.type === 'product' ? inquiryData.productName : 'General Inquiry'}`,
       html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; max-width: 600px;">
-          <h2 style="color: #0d9488; border-bottom: 2px solid #0d9488; padding-bottom: 10px;">New Inquiry Received</h2>
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #0d9488; border-bottom: 2px solid #0d9488; padding-bottom: 10px;">🔔 New Inquiry Received</h2>
           <p>You have received a new inquiry on your website. Here are the details:</p>
           <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
             <tr>
@@ -58,11 +59,10 @@ const sendInquiryNotification = async (inquiryData) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    logger.info(`Notification email sent for inquiry ${inquiryData._id}: ${info.messageId}`);
+    logger.info(`Email notification sent for inquiry ${inquiryData._id}: ${info.messageId}`);
     return info;
   } catch (error) {
-    logger.error(`Error sending email notification: ${error.message}`);
-    // We do NOT throw the error here so that the original API request (saving to DB) still succeeds.
+    logger.error(`Email notification failed: ${error.message}`);
   }
 };
 
