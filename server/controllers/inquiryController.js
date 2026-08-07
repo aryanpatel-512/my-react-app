@@ -2,6 +2,8 @@ const Inquiry = require("../models/Inquiry");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 
+const { sendInquiryNotification } = require("../utils/emailService");
+
 const getInquiries = asyncHandler(async (req, res) => {
   const data = await Inquiry.find({ isDeleted: { $ne: true } }).sort({ createdAt: -1 });
   res.json({ success: true, data, count: data.length });
@@ -17,6 +19,9 @@ const createInquiry = asyncHandler(async (req, res) => {
     type: req.body.type || "general",
     read: false,
   });
+
+  // Send email notification without awaiting to prevent blocking the response
+  sendInquiryNotification(inquiry);
 
   res.status(201).json({
     success: true,
