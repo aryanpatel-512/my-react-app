@@ -248,6 +248,24 @@ body {
   border-color: var(--teal-400);
 }
 
+.nav__whatsapp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  color: #25D366;
+  transition: var(--transition);
+}
+
+.nav__whatsapp:hover {
+  background: #25D366;
+  color: white;
+  border-color: #25D366;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -1382,6 +1400,10 @@ body {
   }
 
   .nav__phone {
+    display: none;
+  }
+
+  .nav__whatsapp {
     display: none;
   }
 

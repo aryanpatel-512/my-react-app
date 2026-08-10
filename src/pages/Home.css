@@ -427,6 +427,24 @@ button {
   background: rgba(20, 184, 166, 0.05);
 }
 
+.nav__whatsapp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  color: #25D366;
+  transition: var(--transition);
+}
+
+.nav__whatsapp:hover {
+  background: #25D366;
+  color: white;
+  border-color: #25D366;
+}
+
 /* Hamburger */
 .hamburger {
   display: none;
@@ -1956,6 +1974,18 @@ button {
   border-color: var(--teal-600);
 }
 
+.contact__person-social-btn--whatsapp {
+  color: #25D366;
+  border-color: rgba(37, 211, 102, 0.3);
+  background: rgba(37, 211, 102, 0.12);
+}
+
+.contact__person-social-btn--whatsapp:hover {
+  background: #25D366;
+  color: white;
+  border-color: #25D366;
+}
+
 .contact__map {
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -2344,6 +2374,10 @@ button {
   }
 
   .nav__phone {
+    display: none;
+  }
+
+  .nav__whatsapp {
     display: none;
   }
 
