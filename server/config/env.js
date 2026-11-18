@@ -3,7 +3,6 @@ const logger = require("../utils/logger");
 const validateEnv = () => {
   const required = [
     "MONGO_URL",
-    "PORT",
     "JWT_SECRET",
     "JWT_REFRESH_SECRET",
     "JWT_EXPIRES_IN"
