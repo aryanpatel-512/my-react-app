@@ -50,21 +50,74 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/settings", settingRoutes);
 
-// Serve frontend dist
+// Health check endpoints (always available)
+const healthHandler = (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "Sri Srinivasa Clean Rooms API",
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+};
+
+app.get("/health", healthHandler);
+app.get("/api/v1/health", healthHandler);
+app.get("/api/health", healthHandler);
+
+// Serve frontend dist if available (local development / monolithic preview)
 const clientDistPath = path.join(__dirname, "../client/dist");
 const rootDistPath = path.join(__dirname, "../dist");
-const distPath = fs.existsSync(clientDistPath) ? clientDistPath : rootDistPath;
-app.use(express.static(distPath));
+const distPath = fs.existsSync(path.join(clientDistPath, "index.html"))
+  ? clientDistPath
+  : fs.existsSync(path.join(rootDistPath, "index.html"))
+  ? rootDistPath
+  : null;
 
-// Catch-all route to serve React index.html for client-side routing
-app.use((req, res, next) => {
-  // If the request is for the API and wasn't caught by the API routes above,
-  // let it fall through to the 404/error handler instead of serving HTML
-  if (req.originalUrl.startsWith("/api/")) {
-    return next();
-  }
-  res.sendFile(path.join(distPath, "index.html"));
-});
+if (distPath) {
+  app.use(express.static(distPath));
+
+  // Catch-all route to serve React index.html for client-side routing
+  app.use((req, res, next) => {
+    // If the request is for the API and wasn't caught by the API routes above,
+    // let it fall through to the 404/error handler instead of serving HTML
+    if (req.originalUrl.startsWith("/api/")) {
+      return next();
+    }
+    const indexPath = path.join(distPath, "index.html");
+    res.sendFile(indexPath, (err) => {
+      if (err && !res.headersSent) {
+        res.status(200).json({
+          success: true,
+          service: "Sri Srinivasa Clean Rooms API",
+          status: "healthy",
+        });
+      }
+    });
+  });
+} else {
+  // Backend-only mode (Render web service hosting API & uploads)
+  app.get("/", (req, res) => {
+    res.status(200).json({
+      success: true,
+      service: "Sri Srinivasa Clean Rooms API",
+      status: "healthy",
+      message: "Backend API is running. Frontend is hosted on Vercel.",
+    });
+  });
+
+  app.use((req, res, next) => {
+    if (req.originalUrl.startsWith("/api/")) {
+      return next();
+    }
+    res.status(404).json({
+      success: false,
+      error: {
+        code: "NOT_FOUND",
+        message: "Endpoint not found on backend API server.",
+      },
+    });
+  });
+}
 
 // Global Error Handler
 app.use(errorMiddleware);
