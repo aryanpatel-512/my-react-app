@@ -7,24 +7,47 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node dependencies and build artifacts
 node_modules
 dist
 dist-ssr
+client/dist
+client/node_modules
+server/node_modules
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.env
+server/.env
+server/.env.*
+!server/.env.example
+client/.env
+client/.env.*
+!client/.env.example
 *.local
 
-# Editor directories and files
+# Python virtual environment
+venv/
+.venv/
+env/
+
+# Editor and OS files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Environment variables
-.env
-.env.local
-server/.env
-server/.env.local
+# Backups and scratch
+backups/
+scratch/
+
+# Internal documentation and audit
+SriSrinivasa_Requirements_Audit/

@@ -1,4 +1,5 @@
 const Category = require("../models/Category");
+const Product = require("../models/Product");
 const asyncHandler = require("../utils/asyncHandler");
 const ApiError = require("../utils/ApiError");
 
@@ -9,12 +10,12 @@ const getCategories = asyncHandler(async (req, res) => {
 
 const createCategory = asyncHandler(async (req, res) => {
   const name = req.body.name.trim();
-  
-  const exists = await Category.findOne({ 
-    name: { $regex: new RegExp(`^${name}$`, 'i') },
-    isDeleted: { $ne: true } 
+
+  const exists = await Category.findOne({
+    name: { $regex: new RegExp(`^${name}$`, "i") },
+    isDeleted: { $ne: true },
   });
-  
+
   if (exists) {
     throw ApiError.conflict("Category already exists");
   }
@@ -30,29 +31,35 @@ const createCategory = asyncHandler(async (req, res) => {
 const updateCategory = asyncHandler(async (req, res) => {
   const name = req.body.name.trim();
 
-  const exists = await Category.findOne({ 
-    name: { $regex: new RegExp(`^${name}$`, 'i') },
+  const existingCategory = await Category.findOne({ _id: req.params.id, isDeleted: { $ne: true } });
+  if (!existingCategory) {
+    throw ApiError.notFound("Category not found");
+  }
+
+  const oldName = existingCategory.name;
+
+  const duplicate = await Category.findOne({
+    name: { $regex: new RegExp(`^${name}$`, "i") },
     _id: { $ne: req.params.id },
-    isDeleted: { $ne: true }
+    isDeleted: { $ne: true },
   });
-  
-  if (exists) {
+
+  if (duplicate) {
     throw ApiError.conflict("Category name already exists");
   }
 
-  const updated = await Category.findByIdAndUpdate(
-    req.params.id,
-    { name },
-    { new: true, runValidators: true }
-  );
+  existingCategory.name = name;
+  await existingCategory.save();
 
-  if (!updated || updated.isDeleted) {
-    throw ApiError.notFound("Category not found");
+  // Synchronize all products that were under the old category name
+  if (oldName !== name) {
+    await Product.updateMany({ category: oldName }, { category: name });
   }
 
   res.json({
     success: true,
-    data: updated,
+    message: "Category Updated Successfully",
+    data: existingCategory,
   });
 });
 

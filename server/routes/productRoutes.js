@@ -1,18 +1,21 @@
 const express = require("express");
 const productController = require("../controllers/productController");
 const productValidator = require("../validators/productValidator");
-const { verifyAdminToken } = require("../middleware/authMiddleware");
-const upload = require("../middleware/uploadMiddleware");
+const { verifyAdminToken, optionalAdminToken } = require("../middleware/authMiddleware");
+const { productUpload } = require("../middleware/uploadMiddleware");
 const logAudit = require("../middleware/auditMiddleware");
 
 const router = express.Router();
 
-router.get("/", productController.getProducts);
+// Public routes (with optional admin preview for disabled items)
+router.get("/", optionalAdminToken, productController.getProducts);
+router.get("/:id", optionalAdminToken, productController.getProductById);
 
+// Protected admin routes
 router.post(
   "/",
   verifyAdminToken,
-  upload.single("image"),
+  productUpload,
   productValidator.validateCreateProduct,
   logAudit("Product"),
   productController.createProduct
@@ -21,10 +24,17 @@ router.post(
 router.put(
   "/:id",
   verifyAdminToken,
-  upload.single("image"),
+  productUpload,
   productValidator.validateUpdateProduct,
   logAudit("Product"),
   productController.updateProduct
+);
+
+router.patch(
+  "/:id/status",
+  verifyAdminToken,
+  logAudit("Product"),
+  productController.toggleProductStatus
 );
 
 router.delete("/:id", verifyAdminToken, logAudit("Product"), productController.deleteProduct);

@@ -39,4 +39,26 @@ const authorizeRoles = (...roles) => {
   };
 };
 
-module.exports = { verifyAdminToken, authorizeRoles };
+const optionalAdminToken = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const admin = await Admin.findOne({ username: decoded.username });
+        if (admin && admin.isActive) {
+          req.admin = admin;
+        }
+      } catch (err) {
+        // Silently ignore on optional auth
+      }
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { verifyAdminToken, authorizeRoles, optionalAdminToken };
+

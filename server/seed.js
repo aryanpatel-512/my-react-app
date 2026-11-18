@@ -1,6 +1,8 @@
 require("dotenv").config({ path: "./.env" });
 const mongoose = require("mongoose");
 const dns = require("dns");
+const fs = require("fs");
+const path = require("path");
 const Product = require("./models/Product");
 const Admin = require("./models/Admin");
 const Category = require("./models/Category");
@@ -12,16 +14,21 @@ mongoose.connect(process.env.MONGO_URL)
   console.log("✅ MongoDB Connected");
 
   // 1. Seed Admin
-  const adminExists = await Admin.findOne({ username: "admin" });
+  const targetUser = process.env.ADMIN_USER || "admin";
+  const adminExists = await Admin.findOne({ username: targetUser });
   if (!adminExists) {
+    if (!process.env.ADMIN_PASS) {
+      console.error("❌ ADMIN_PASS is required in .env to create admin.");
+      process.exit(1);
+    }
     await Admin.create({
-      username: "admin",
-      passwordHash: "admin123", // Will be hashed by pre-save hook
-      email: "admin@example.com"
+      username: targetUser,
+      passwordHash: process.env.ADMIN_PASS, // Will be hashed by pre-save hook
+      email: "admin@srisrinivasa.com"
     });
-    console.log("👤 Default Admin Created (admin / admin123)");
+    console.log(`👤 Admin Created (${targetUser})`);
   } else {
-    console.log("👤 Admin already exists");
+    console.log(`👤 Admin (${targetUser}) already exists`);
   }
 
   // 2. Seed Default Categories
@@ -42,14 +49,28 @@ mongoose.connect(process.env.MONGO_URL)
 
   // 3. Optional Products seed
   try {
-    const products = require("../src/data/products").default;
-    if (products && products.length > 0) {
-      await Product.deleteMany();
-      await Product.insertMany(products);
-      console.log("🔥 Products Inserted Successfully");
+    const existingCount = await Product.countDocuments();
+    if (existingCount === 0) {
+      const clientProductsPath = path.join(__dirname, "../client/src/data/products.js");
+      const rootProductsPath = path.join(__dirname, "../src/data/products.js");
+      const targetPath = fs.existsSync(clientProductsPath)
+        ? "../client/src/data/products"
+        : fs.existsSync(rootProductsPath)
+        ? "../src/data/products"
+        : null;
+
+      if (targetPath) {
+        const products = require(targetPath).default;
+        if (products && products.length > 0) {
+          await Product.insertMany(products);
+          console.log("🔥 Products Inserted Successfully");
+        }
+      }
+    } else {
+      console.log(`ℹ️ Products already exist (${existingCount} products in DB). Skipping product seed.`);
     }
   } catch (err) {
-    console.log("⚠️ No products to seed");
+    console.log("ℹ️ No products to seed or error:", err.message);
   }
 
   process.exit();

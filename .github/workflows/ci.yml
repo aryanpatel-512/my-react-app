@@ -29,7 +29,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: './server/package-lock.json'
+        cache-dependency-path: |
+          ./server/package-lock.json
+          ./client/package-lock.json
 
     - name: Install backend dependencies
       working-directory: ./server
@@ -44,7 +46,9 @@ jobs:
         JWT_REFRESH_SECRET: test_refresh_secret
 
     - name: Install frontend dependencies
+      working-directory: ./client
       run: npm ci
 
     - name: Build frontend
+      working-directory: ./client
       run: npm run build

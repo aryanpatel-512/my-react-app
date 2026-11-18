@@ -22,9 +22,13 @@ const login = asyncHandler(async (req, res) => {
     { expiresIn: "15m" }
   );
 
+  if (!process.env.JWT_REFRESH_SECRET) {
+    throw ApiError.internal("JWT_REFRESH_SECRET is not configured on the server");
+  }
+
   const refreshToken = jwt.sign(
     { username: admin.username },
-    process.env.JWT_REFRESH_SECRET || "refresh_secret",
+    process.env.JWT_REFRESH_SECRET,
     { expiresIn: "7d" }
   );
 
@@ -61,7 +65,10 @@ const refresh = asyncHandler(async (req, res) => {
   }
 
   try {
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || "refresh_secret");
+    if (!process.env.JWT_REFRESH_SECRET) {
+      throw ApiError.internal("JWT_REFRESH_SECRET is not configured on the server");
+    }
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
     
     const accessToken = jwt.sign(
       { username: admin.username, role: admin.role },
